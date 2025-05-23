@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import Color from './color'
-import { VisionSimulationModeConfiguration } from '@tps/configurations.types'
+import { VisionSimulationModeConfiguration } from '@tps/configuration.types'
 import { Channel, ChannelWithAlpha } from '@tps/color.types'
 
 describe('Color', () => {

@@ -3,7 +3,7 @@ import {
   ColorConfiguration,
   PresetConfiguration,
   ThemeConfiguration,
-} from './configurations.types'
+} from './configuration.types'
 
 export interface PaletteData {
   name: string

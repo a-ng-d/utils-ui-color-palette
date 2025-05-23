@@ -1,7 +1,7 @@
 import {
   AlgorithmVersionConfiguration,
   VisionSimulationModeConfiguration,
-} from '@tps/configurations.types'
+} from '@tps/configuration.types'
 import chroma from 'chroma-js'
 import { Hsluv } from 'hsluv'
 import { ActionsList, ColorFormat } from '@tps/model.types'

@@ -6,7 +6,7 @@ import {
   ScaleConfiguration,
   ThemeConfiguration,
   FullConfiguration,
-} from '@tps/configurations.types'
+} from '@tps/configuration.types'
 import {
   PaletteData,
   PaletteDataColorItem,

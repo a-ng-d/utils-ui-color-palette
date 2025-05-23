@@ -6,7 +6,7 @@ import {
   MetaConfiguration,
   Easing,
   ColorSpaceConfiguration,
-} from '@tps/configurations.types'
+} from '@tps/configuration.types'
 import { PaletteDataThemeItem } from '@tps/data.types'
 
 describe('Data', () => {
