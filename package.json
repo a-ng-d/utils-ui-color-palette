@@ -1,7 +1,7 @@
 {
   "name": "@a_ng_d/utils-ui-color-palette",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "files": [
     "dist"
