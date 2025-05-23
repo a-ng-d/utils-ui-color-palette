@@ -1,9 +1,16 @@
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/a-ng-d/utils-ui-color-palette?color=informational) ![GitHub last commit](https://img.shields.io/github/last-commit/a-ng-d/utils-ui-color-palette?color=informational) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/a-ng-d/utils-ui-color-palette/npm.yml?label=npm) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/a-ng-d/utils-ui-color-palette/chromatic.yml?label=Chromatic) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/a-ng-d/utils-ui-color-palette/deploy.yml?label=Deployment)
 ![GitHub](https://img.shields.io/github/license/a-ng-d/utils-ui-color-palette?color=informational)
 
-# Color Utilities for Figma
+# UI Color Palette Utils
 
-A comprehensive collection of color utilities designed for Figma plugin development, focusing on color manipulation, contrast calculation, and palette generation.
+Core utilities library for UI Color Palette - a color management plugin for design tools. This library provides the foundational color manipulation, contrast calculation, and palette generation features used in the plugin.
+
+## Design Tools Compatibility
+
+UI Color Palette is available for:
+- Figma - Create and manage color primivites directly in your Figma designs
+- FigJam - Collaborate on color decisions with your team
+- Penpot - Open-source design tool alternative with full color management support
 
 ## Features
 
