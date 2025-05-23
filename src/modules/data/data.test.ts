@@ -205,7 +205,11 @@ describe('Data', () => {
     })
 
     const result = data.makePaletteData()
-    expect(result.themes[0].colors[0].shades.some((shade) => shade.isSourceColorLocked)).toBe(true)
+    expect(
+      result.themes[0].colors[0].shades.some(
+        (shade) => shade.isSourceColorLocked
+      )
+    ).toBe(true)
   })
 
   it('should handle different vision simulation modes', () => {

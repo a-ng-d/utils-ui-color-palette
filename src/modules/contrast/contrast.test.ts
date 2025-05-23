@@ -128,13 +128,13 @@ describe('Contrast', () => {
   it('should handle edge cases in WCAG contrast calculation', () => {
     const darkContrast = new Contrast({
       backgroundColor: [0, 0, 0],
-      textColor: '#000000'
+      textColor: '#000000',
     })
     expect(darkContrast.getWCAGContrast()).toBe(1)
 
     const brightContrast = new Contrast({
       backgroundColor: [255, 255, 255],
-      textColor: '#FFFFFF'
+      textColor: '#FFFFFF',
     })
     expect(brightContrast.getWCAGContrast()).toBe(1)
   })
@@ -147,13 +147,13 @@ describe('Contrast', () => {
     }[] = [
       { bg: [0, 0, 0], text: '#000000', expected: 0 },
       { bg: [255, 255, 255], text: '#FFFFFF', expected: 0 },
-      { bg: [128, 128, 128], text: '#808080', expected: 0 }
+      { bg: [128, 128, 128], text: '#808080', expected: 0 },
     ]
 
     edgeCases.forEach(({ bg, text, expected }) => {
       const contrast = new Contrast({
         backgroundColor: bg,
-        textColor: text
+        textColor: text,
       })
       expect(contrast.getAPCAContrast()).toBe(expected)
     })
@@ -168,13 +168,13 @@ describe('Contrast', () => {
       { bg: [0, -1, 0], text: '#000000' },
       { bg: [0, 256, 0], text: '#000000' },
       { bg: [0, 0, -1], text: '#000000' },
-      { bg: [0, 0, 256], text: '#000000' }
+      { bg: [0, 0, 256], text: '#000000' },
     ]
 
     invalidCases.forEach(({ bg, text }) => {
       const contrast = new Contrast({
         backgroundColor: bg,
-        textColor: text
+        textColor: text,
       })
       expect(() => contrast.getWCAGContrast()).not.toThrow()
       expect(() => contrast.getAPCAContrast()).not.toThrow()
@@ -206,11 +206,11 @@ describe('Contrast', () => {
       { level: 50, expected: 'HEADLINES' },
       { level: 35, expected: 'SPOT_TEXT' },
       { level: 20, expected: 'NON_TEXT' },
-      { level: 10, expected: 'AVOID' }
+      { level: 10, expected: 'AVOID' },
     ]
 
     const contrast = new Contrast({ backgroundColor, textColor })
-    
+
     // Mock getAPCAContrast pour tester chaque niveau
     testCases.forEach(({ level, expected }) => {
       const originalMethod = contrast.getAPCAContrast
@@ -222,11 +222,11 @@ describe('Contrast', () => {
 
   it('should handle precision in getLightnessForContrastRatio', () => {
     const contrast = new Contrast({ backgroundColor, textColor })
-    
+
     const testCases = [
       { ratio: 4.5, precision: 0.1 },
       { ratio: 7, precision: 0.01 },
-      { ratio: 3, precision: 1 }
+      { ratio: 3, precision: 1 },
     ]
 
     testCases.forEach(({ ratio, precision }) => {
