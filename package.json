@@ -1,7 +1,25 @@
 {
   "name": "@a_ng_d/utils-ui-color-palette",
-  "private": true,
+  "private": false,
   "version": "1.0.1",
+  "description": "Core utilities library for UI Color Palette - a color management plugin for design tools. This library provides the foundational color manipulation, contrast calculation, and palette generation features used in the plugin.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/a-ng-d/utils-ui-color-palette.git"
+  },
+  "keywords": [
+    "color",
+    "palette",
+    "contrast",
+    "utilities",
+    "figma"
+  ],
+  "author": "Aurélien Grimaud",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/a-ng-d/utils-ui-color-palette/issues"
+  },
+  "homepage": "https://github.com/a-ng-d/utils-ui-color-palette#readme",
   "type": "module",
   "files": [
     "dist"
@@ -39,23 +57,5 @@
     "apca-w3": "^0.1.9",
     "chroma-js": "^2.4.2",
     "hsluv": "^1.0.1"
-  },
-  "description": "",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/a-ng-d/utils-ui-color-palette.git"
-  },
-  "keywords": [
-    "color",
-    "palette",
-    "contrast",
-    "utilities",
-    "figma"
-  ],
-  "author": "Aurélien Grimaud",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/a-ng-d/utils-ui-color-palette/issues"
-  },
-  "homepage": "https://github.com/a-ng-d/utils-ui-color-palette#readme"
+  }
 }
