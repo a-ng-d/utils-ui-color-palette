@@ -1,0 +1,216 @@
+import { describe, it, expect } from 'vitest'
+import Data from './data'
+import {
+  BaseConfiguration,
+  ThemeConfiguration,
+  MetaConfiguration,
+} from '@tps/configurations.types'
+import { PaletteDataThemeItem } from '@tps/data.types'
+
+describe('Data', () => {
+  const mockBase: BaseConfiguration = {
+    name: 'Test Palette',
+    description: 'Test Description',
+    preset: {
+      id: 'custom',
+      name: 'Custom',
+      stops: [1, 2, 3],
+      min: 0,
+      max: 100,
+      easing: 'LINEAR',
+    },
+    shift: {
+      chroma: 100,
+    },
+    colors: [
+      {
+        id: 'color1',
+        name: 'Test Color',
+        description: 'A test color',
+        rgb: { r: 1, g: 0, b: 0 },
+        alpha: {
+          isEnabled: false,
+          backgroundColor: '#FFFFFF',
+        },
+        hue: { shift: 0, isLocked: false },
+        chroma: { shift: 100, isLocked: false },
+      },
+    ],
+    colorSpace: 'LCH',
+    algorithmVersion: 'v3',
+    areSourceColorsLocked: false,
+  }
+
+  const mockTheme: ThemeConfiguration = {
+    id: 'theme1',
+    name: 'Test Theme',
+    description: 'A test theme',
+    type: 'default theme',
+    scale: {
+      '100': 100,
+      '50': 50,
+    },
+    visionSimulationMode: 'NONE',
+    textColorsTheme: {
+      lightColor: '#FFFFFF',
+      darkColor: '#000000',
+    },
+    paletteBackground: '#FFFFFF',
+    isEnabled: true,
+  }
+
+  const mockMeta: MetaConfiguration = {
+    id: 'palette1',
+    dates: {
+      createdAt: '2023-01-01',
+      updatedAt: '2023-01-01',
+      publishedAt: '2023-01-01',
+    },
+    creatorIdentity: {
+      creatorFullName: 'Test Creator',
+      creatorId: 'testcreator',
+      creatorAvatar: 'https://example.com/avatar.png',
+    },
+    publicationStatus: {
+      isPublished: false,
+      isShared: false,
+    },
+  }
+
+  it('should create an instance with correct initial values', () => {
+    const data = new Data({
+      base: mockBase,
+      themes: [mockTheme],
+      meta: mockMeta,
+    })
+    expect(data).toBeDefined()
+  })
+
+  it('should return correct styleId from searchForShadeStyleId', () => {
+    const data = new Data({
+      base: mockBase,
+      themes: [mockTheme],
+      meta: mockMeta,
+    })
+
+    const themes = [
+      {
+        id: 'theme1',
+        name: 'Test Theme',
+        description: 'A test theme',
+        type: 'default theme',
+        colors: [
+          {
+            id: 'color1',
+            name: 'Test Color',
+            description: 'A test color',
+            shades: [
+              {
+                name: 'shade1',
+                styleId: 'test-style-id',
+              },
+            ],
+          },
+        ],
+      },
+    ] as Array<PaletteDataThemeItem>
+
+    const result = data.searchForShadeStyleId(
+      themes,
+      'theme1',
+      'color1',
+      'shade1'
+    )
+    expect(result).toBe('test-style-id')
+  })
+
+  it('should return empty string for non-existent shade in searchForShadeStyleId', () => {
+    const data = new Data({
+      base: mockBase,
+      themes: [mockTheme],
+      meta: mockMeta,
+    })
+
+    const result = data.searchForShadeStyleId([], 'theme1', 'color1', 'shade1')
+    expect(result).toBe('')
+  })
+
+  it('should generate palette data with makePaletteData', () => {
+    const data = new Data({
+      base: mockBase,
+      themes: [mockTheme],
+      meta: mockMeta,
+    })
+
+    const result = data.makePaletteData()
+    expect(result).toBeDefined()
+    expect(result.name).toBe('Test Palette')
+    expect(result.themes).toHaveLength(1)
+  })
+
+  it('should generate full palette data with makePaletteFullData', () => {
+    const data = new Data({
+      base: mockBase,
+      themes: [mockTheme],
+      meta: mockMeta,
+    })
+
+    const result = data.makePaletteFullData()
+    expect(result).toBeDefined()
+    expect(result.base).toEqual(mockBase)
+    expect(result.themes).toEqual([mockTheme])
+    expect(result.meta).toEqual(mockMeta)
+    expect(result.type).toBe('UI_COLOR_PALETTE')
+  })
+
+  // Test with alpha enabled color
+  it('should handle alpha enabled colors correctly', () => {
+    const baseWithAlpha: BaseConfiguration = {
+      ...mockBase,
+      colors: [
+        {
+          ...mockBase.colors[0],
+          alpha: {
+            isEnabled: true,
+            backgroundColor: '#FFFFFF',
+          },
+        },
+      ],
+    }
+
+    const data = new Data({
+      base: baseWithAlpha,
+      themes: [mockTheme],
+      meta: mockMeta,
+    })
+
+    const result = data.makePaletteData()
+    expect(
+      result.themes[0].colors[0].shades.some((shade) => shade.isTransparent)
+    ).toBe(true)
+  })
+
+  // Test different color spaces
+  it('should handle different color spaces correctly', () => {
+    const colorSpaces: Array<
+      'LCH' | 'OKLCH' | 'LAB' | 'OKLAB' | 'HSL' | 'HSLUV'
+    > = ['LCH', 'OKLCH', 'LAB', 'OKLAB', 'HSL', 'HSLUV']
+
+    colorSpaces.forEach((colorSpace) => {
+      const baseWithColorSpace: BaseConfiguration = {
+        ...mockBase,
+        colorSpace,
+      }
+
+      const data = new Data({
+        base: baseWithColorSpace,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+
+      const result = data.makePaletteData()
+      expect(result).toBeDefined()
+      expect(result.themes[0].colors[0].shades.length).toBeGreaterThan(0)
+    })
+  })
+})
