@@ -1,4 +1,4 @@
-![GitHub package.json version](https://img.shields.io/github/package-json/v/a-ng-d/utils-ui-color-palette?color=informational) ![GitHub last commit](https://img.shields.io/github/last-commit/a-ng-d/utils-ui-color-palette?color=informational) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/a-ng-d/utils-ui-color-palette/npm.yml?label=npm) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/a-ng-d/utils-ui-color-palette/chromatic.yml?label=Chromatic) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/a-ng-d/utils-ui-color-palette/deploy.yml?label=Deployment)
+![GitHub package.json version](https://img.shields.io/github/package-json/v/a-ng-d/utils-ui-color-palette?color=informational) ![GitHub last commit](https://img.shields.io/github/last-commit/a-ng-d/utils-ui-color-palette?color=informational) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/a-ng-d/utils-ui-color-palette/npm.yml?label=npm)
 ![GitHub](https://img.shields.io/github/license/a-ng-d/utils-ui-color-palette?color=informational)
 
 # UI Color Palette Utils
@@ -119,6 +119,24 @@ const mixedHex = color.mixColorsHex('#FF0000', '#0000FF');
 npm test
 # or
 yarn test
+```
+
+## Code Coverage
+
+Current test coverage results:
+
+```
+File          | % Stmts | % Branch | % Funcs | % Lines
+--------------|---------|----------|---------|--------
+All files     |   76.09 |    62.63 |   75.86 |   76.09
+ color.ts     |   72.06 |    68.05 |   66.66 |   72.06
+ contrast.ts  |   81.51 |    65.51 |     100 |   81.51
+ data.ts      |   80.14 |     57.3 |     100 |   80.14
+```
+
+To run coverage tests:
+```bash
+npm run test:coverage
 ```
 
 ## Credits
