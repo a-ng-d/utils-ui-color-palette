@@ -124,4 +124,115 @@ describe('Contrast', () => {
     contrast.getLightnessForContrastRatio(21, 0.1)
     expect(contrast.getRecommendedUsage()).toBe('FLUENT_TEXT')
   })
+
+  it('should handle edge cases in WCAG contrast calculation', () => {
+    const darkContrast = new Contrast({
+      backgroundColor: [0, 0, 0],
+      textColor: '#000000'
+    })
+    expect(darkContrast.getWCAGContrast()).toBe(1)
+
+    const brightContrast = new Contrast({
+      backgroundColor: [255, 255, 255],
+      textColor: '#FFFFFF'
+    })
+    expect(brightContrast.getWCAGContrast()).toBe(1)
+  })
+
+  it('should handle edge cases in APCA contrast calculation', () => {
+    const edgeCases: {
+      bg: Channel
+      text: HexModel
+      expected: number
+    }[] = [
+      { bg: [0, 0, 0], text: '#000000', expected: 0 },
+      { bg: [255, 255, 255], text: '#FFFFFF', expected: 0 },
+      { bg: [128, 128, 128], text: '#808080', expected: 0 }
+    ]
+
+    edgeCases.forEach(({ bg, text, expected }) => {
+      const contrast = new Contrast({
+        backgroundColor: bg,
+        textColor: text
+      })
+      expect(contrast.getAPCAContrast()).toBe(expected)
+    })
+  })
+
+  it('should handle invalid color values', () => {
+    const invalidCases: {
+      bg: Channel
+      text: HexModel
+    }[] = [
+      { bg: [256, 0, 0], text: '#000000' },
+      { bg: [0, -1, 0], text: '#000000' },
+      { bg: [0, 256, 0], text: '#000000' },
+      { bg: [0, 0, -1], text: '#000000' },
+      { bg: [0, 0, 256], text: '#000000' }
+    ]
+
+    invalidCases.forEach(({ bg, text }) => {
+      const contrast = new Contrast({
+        backgroundColor: bg,
+        textColor: text
+      })
+      expect(() => contrast.getWCAGContrast()).not.toThrow()
+      expect(() => contrast.getAPCAContrast()).not.toThrow()
+    })
+  })
+
+  it('should handle all WCAG score cases', () => {
+    const testCases: {
+      bg: Channel
+      text: HexModel
+      expected: 'A' | 'AA' | 'AAA'
+    }[] = [
+      { bg: [0, 0, 0], text: '#FFFFFF', expected: 'AAA' }, // High contrast
+      { bg: [100, 100, 100], text: '#FFFFFF', expected: 'AA' }, // Medium contrast
+      { bg: [200, 200, 200], text: '#FFFFFF', expected: 'A' }, // Low contrast
+    ]
+
+    testCases.forEach(({ bg, text, expected }) => {
+      const contrast = new Contrast({ backgroundColor: bg, textColor: text })
+      expect(contrast.getWCAGScore()).toBe(expected)
+    })
+  })
+
+  it('should handle all recommended usage cases', () => {
+    const testCases = [
+      { level: 95, expected: 'FLUENT_TEXT' },
+      { level: 80, expected: 'CONTENT_TEXT' },
+      { level: 65, expected: 'BODY_TEXT' },
+      { level: 50, expected: 'HEADLINES' },
+      { level: 35, expected: 'SPOT_TEXT' },
+      { level: 20, expected: 'NON_TEXT' },
+      { level: 10, expected: 'AVOID' }
+    ]
+
+    const contrast = new Contrast({ backgroundColor, textColor })
+    
+    // Mock getAPCAContrast pour tester chaque niveau
+    testCases.forEach(({ level, expected }) => {
+      const originalMethod = contrast.getAPCAContrast
+      contrast.getAPCAContrast = () => level
+      expect(contrast.getRecommendedUsage()).toBe(expected)
+      contrast.getAPCAContrast = originalMethod
+    })
+  })
+
+  it('should handle precision in getLightnessForContrastRatio', () => {
+    const contrast = new Contrast({ backgroundColor, textColor })
+    
+    const testCases = [
+      { ratio: 4.5, precision: 0.1 },
+      { ratio: 7, precision: 0.01 },
+      { ratio: 3, precision: 1 }
+    ]
+
+    testCases.forEach(({ ratio, precision }) => {
+      const lightness = contrast.getLightnessForContrastRatio(ratio, precision)
+      expect(lightness).toBeGreaterThanOrEqual(0)
+      expect(lightness).toBeLessThanOrEqual(100)
+    })
+  })
 })

@@ -125,4 +125,116 @@ describe('Color', () => {
       expect(result).toBeDefined()
     })
   })
+
+  it('should handle color space transformations with invalid values', () => {
+    const color = new Color({
+      sourceColor: [300, -50, 1000],
+    })
+
+    expect(color.lch()).toBeDefined()
+    expect(color.oklch()).toBeDefined()
+    expect(color.lab()).toBeDefined()
+    expect(color.oklab()).toBeDefined()
+  })
+
+  it('should handle extreme color adjustments', () => {
+    const color = new Color({
+      sourceColor,
+      lightness: 200,
+      chromaShifting: -150,
+    })
+
+    expect(color.setColor()).toBeDefined()
+    expect(color.setColorWithAlpha()).toBeDefined()
+  })
+
+  it('should handle color interpolation edge cases', () => {
+    const color = new Color({ sourceColor })
+
+    // Test with extreme alpha values
+    expect(color.mixColorsRgb([255, 0, 0, 2], [0, 255, 0, -1])).toBeDefined()
+  })
+
+  it('should properly handle color space boundaries', () => {
+    const color = new Color({
+      sourceColor,
+      hueShifting: 720, // Over 360 degrees
+      chromaShifting: 200, // Over 100%
+    })
+
+    const result = color.setColor()
+    expect(result).toBeDefined()
+
+    const methods = ['lch', 'oklch', 'lab', 'oklab', 'hsl', 'hsluv']
+    methods.forEach((method) => {
+      expect(color[method as keyof Color]).toBeDefined()
+    })
+  })
+
+  it('should handle invalid hex colors in mixColorsHex', () => {
+    const color = new Color({ sourceColor })
+    expect(color.mixColorsHex('invalid', '#FF0000')).toBeDefined()
+    expect(color.mixColorsHex('#FF0000', 'invalid')).toBeDefined()
+    expect(color.mixColorsHex('invalid', 'invalid')).toBeDefined()
+  })
+
+  it('should handle zero and negative values in adjustments', () => {
+    const color = new Color({
+      sourceColor,
+      lightness: 0,
+      chromaShifting: -200,
+      hueShifting: -360,
+    })
+    expect(color.setColor()).toBeDefined()
+    expect(color.adjustChroma(-50)).toBeDefined()
+    expect(color.adjustHue(-180)).toBeDefined()
+  })
+
+  it('should handle all color space transformations', () => {
+    const methods = [
+      'lch',
+      'oklch',
+      'lab',
+      'oklab',
+      'hsl',
+      'hsluv',
+      'lcha',
+      'oklcha',
+      'laba',
+      'oklaba',
+      'hsla',
+      'hsluva',
+    ]
+    const color = new Color({ sourceColor })
+
+    methods.forEach((method) => {
+      expect(color[method as keyof Color]).toBeDefined()
+    })
+  })
+
+  it('should handle extreme alpha values in color mixing', () => {
+    const color = new Color({ sourceColor })
+    const extremeCases: Array<[ChannelWithAlpha, ChannelWithAlpha]> = [
+      [
+        [255, 0, 0, 2],
+        [0, 0, 255, 1],
+      ],
+      [
+        [255, 0, 0, -1],
+        [0, 0, 255, 0.5],
+      ],
+      [
+        [255, 0, 0, 0],
+        [0, 0, 255, 0],
+      ],
+      [
+        [255, 0, 0, 1],
+        [0, 0, 255, 2],
+      ],
+    ]
+
+    extremeCases.forEach(([colorA, colorB]) => {
+      expect(color.mixColorsRgb(colorA, colorB)).toBeDefined()
+    })
+  })
 })

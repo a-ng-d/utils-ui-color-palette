@@ -1,4 +1,4 @@
-import { Channel, HexModel } from './color.types'
+import { Channel, ChannelWithAlpha, HexModel } from './color.types'
 import {
   ColorConfiguration,
   PresetConfiguration,
@@ -36,7 +36,7 @@ export interface PaletteDataShadeItem {
   description: string
   hex: HexModel
   rgb: Channel
-  gl: Channel
+  gl: ChannelWithAlpha
   lch: Channel
   oklch: Channel
   lab: Channel

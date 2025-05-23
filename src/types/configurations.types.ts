@@ -72,7 +72,7 @@ export type Easing =
 export interface PresetConfiguration {
   id: string
   name: string
-  scale: Array<number>
+  stops: Array<number>
   min: number
   max: number
   easing: Easing

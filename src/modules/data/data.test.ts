@@ -4,6 +4,8 @@ import {
   BaseConfiguration,
   ThemeConfiguration,
   MetaConfiguration,
+  Easing,
+  ColorSpaceConfiguration,
 } from '@tps/configurations.types'
 import { PaletteDataThemeItem } from '@tps/data.types'
 
@@ -190,16 +192,45 @@ describe('Data', () => {
     ).toBe(true)
   })
 
-  // Test different color spaces
-  it('should handle different color spaces correctly', () => {
-    const colorSpaces: Array<
-      'LCH' | 'OKLCH' | 'LAB' | 'OKLAB' | 'HSL' | 'HSLUV'
-    > = ['LCH', 'OKLCH', 'LAB', 'OKLAB', 'HSL', 'HSLUV']
+  it('should handle locked source colors correctly', () => {
+    const baseWithLockedColors: BaseConfiguration = {
+      ...mockBase,
+      areSourceColorsLocked: true,
+    }
 
-    colorSpaces.forEach((colorSpace) => {
+    const data = new Data({
+      base: baseWithLockedColors,
+      themes: [mockTheme],
+      meta: mockMeta,
+    })
+
+    const result = data.makePaletteData()
+    expect(result.themes[0].colors[0].shades.some((shade) => shade.isSourceColorLocked)).toBe(true)
+  })
+
+  it('should handle different vision simulation modes', () => {
+    const themeWithSimulation: ThemeConfiguration = {
+      ...mockTheme,
+      visionSimulationMode: 'PROTANOPIA',
+    }
+
+    const data = new Data({
+      base: mockBase,
+      themes: [themeWithSimulation],
+      meta: mockMeta,
+    })
+
+    const result = data.makePaletteData()
+    expect(result.themes[0].colors[0].shades.length).toBeGreaterThan(0)
+  })
+
+  it('should handle all color space configurations', () => {
+    const colorSpaces = ['LCH', 'OKLCH', 'LAB', 'OKLAB', 'HSL', 'HSLUV']
+
+    colorSpaces.forEach((space) => {
       const baseWithColorSpace: BaseConfiguration = {
         ...mockBase,
-        colorSpace,
+        colorSpace: space as ColorSpaceConfiguration,
       }
 
       const data = new Data({
@@ -209,8 +240,90 @@ describe('Data', () => {
       })
 
       const result = data.makePaletteData()
-      expect(result).toBeDefined()
-      expect(result.themes[0].colors[0].shades.length).toBeGreaterThan(0)
+      expect(result.themes[0].colors[0].shades[0]).toBeDefined()
     })
+  })
+
+  it('should handle edge cases in theme configurations', () => {
+    const data = new Data({
+      base: {
+        ...mockBase,
+        colors: [],
+      },
+      themes: [],
+      meta: mockMeta,
+    })
+
+    const result = data.makePaletteData()
+    expect(result).toBeDefined()
+    expect(result.themes).toHaveLength(0)
+  })
+
+  it('should handle invalid color configurations', () => {
+    const data = new Data({
+      base: {
+        ...mockBase,
+        colors: [
+          {
+            ...mockBase.colors[0],
+            rgb: { r: -1, g: 256, b: 1000 },
+          },
+        ],
+      },
+      themes: [mockTheme],
+      meta: mockMeta,
+    })
+
+    const result = data.makePaletteData()
+    expect(result).toBeDefined()
+    expect(result.themes[0].colors).toBeDefined()
+  })
+
+  it('should handle missing optional fields', () => {
+    const minimalBase = {
+      name: 'Minimal',
+      description: 'Minimal description',
+      preset: {
+        id: 'minimal',
+        name: 'Minimal Preset',
+        stops: [],
+        min: 0,
+        max: 100,
+        easing: 'LINEAR' as Easing,
+      },
+      shift: {
+        chroma: 0,
+      },
+      colors: [],
+      colorSpace: 'LCH' as const,
+      algorithmVersion: 'v3' as const,
+      areSourceColorsLocked: false,
+    }
+
+    const data = new Data({
+      base: minimalBase,
+      themes: [],
+      meta: {
+        id: 'minimal',
+        dates: {
+          createdAt: '2023-01-01',
+          updatedAt: '2023-01-01',
+          publishedAt: '2023-01-01',
+        },
+        creatorIdentity: {
+          creatorFullName: 'Minimal Creator',
+          creatorId: 'minimalcreator',
+          creatorAvatar: 'https://example.com/avatar.png',
+        },
+        publicationStatus: {
+          isPublished: false,
+          isShared: false,
+        },
+      },
+    })
+
+    const result = data.makePaletteFullData()
+    expect(result).toBeDefined()
+    expect(result.type).toBe('UI_COLOR_PALETTE')
   })
 })
