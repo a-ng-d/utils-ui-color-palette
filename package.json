@@ -9,10 +9,10 @@
   },
   "keywords": [
     "color",
-    "palette",
     "contrast",
-    "utilities",
-    "figma"
+    "wcag2",
+    "wcag3",
+    "apca"
   ],
   "author": "Aurélien Grimaud",
   "license": "MIT",
