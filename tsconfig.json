@@ -35,5 +35,5 @@
     "outDir": "./dist",
     "rootDir": "./src"
   },
-  "include": ["src", "src/env.d.ts"]
+  "include": ["src", "env.d.ts"]
 }
