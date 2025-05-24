@@ -43,19 +43,58 @@ yarn add @a_ng_d/utils-ui-color-palette
 ## Usage
 
 ```typescript
-import {
-  calculateContrast,
-  generatePalette,
-} from '@a_ng_d/utils-ui-color-palette'
+import { Color, Contrast, Data } from '@a_ng_d/utils-ui-color-palette'
 
-// Calculate contrast between two colors
-const contrast = calculateContrast('#000000', '#FFFFFF')
+// Use Color class for color manipulation
+const color = new Color({
+  sourceColor: [255, 0, 0], // RGB values
+  lightness: 50,
+  hueShifting: 0,
+  chromaShifting: 100
+})
 
-// Generate a color palette
-const palette = generatePalette('#FF0000', { steps: 10 })
-```
+// Use Contrast class for accessibility checks
+const contrast = new Contrast({
+  backgroundColor: [255, 255, 255],
+  textColor: '#000000'
+})
+
+// Use Data class for palette generation
+const data = new Data({
+  base: baseConfig,
+  themes: themesConfig,
+  meta: metaConfig
+})
+```x
 
 ## Examples
+
+### Color Manipulation
+
+```typescript
+import { Color } from '@a_ng_d/utils-ui-color-palette'
+
+// Create a color instance
+const color = new Color({
+  sourceColor: [255, 0, 0],  // Red in RGB
+  lightness: 50,
+  chromaShifting: 100
+})
+
+// Convert to different color spaces
+const lchColor = color.lch()        // Returns LCH color
+const oklchColor = color.oklch()    // Returns OKLCH color
+const hslColor = color.hsl()        // Returns HSL color
+const labColor = color.lab()        // Returns LAB color
+
+// Mix colors
+const mixedRgb = color.mixColorsRgb(
+  [255, 0, 0, 0.5],  // Semi-transparent red
+  [0, 0, 255, 1]     // Solid blue
+)
+
+const mixedHex = color.mixColorsHex('#FF0000', '#0000FF')
+```
 
 ### Contrast Calculations
 
@@ -65,61 +104,52 @@ import { Contrast } from '@a_ng_d/utils-ui-color-palette'
 // Create a contrast checker instance
 const contrast = new Contrast({
   backgroundColor: [255, 255, 255], // White background
-  textColor: '#000000', // Black text
+  textColor: '#000000'              // Black text
 })
 
-// Get WCAG contrast ratio
-const wcagScore = contrast.getWCAGScore() // Returns: 'AAA'
+// Get contrast values
+const wcagContrast = contrast.getWCAGContrast()     // WCAG 2.1 contrast ratio
+const apcaContrast = contrast.getAPCAContrast()     // APCA contrast value
+const wcagScore = contrast.getWCAGScore()           // Returns: 'AAA', 'AA', or 'A'
 
-// Get APCA contrast value
-const apcaScore = contrast.getAPCAContrast() // Returns: ~106
+// Get accessibility recommendations
+const usage = contrast.getRecommendedUsage()        // Returns usage recommendation
+const minSizes = contrast.getMinFontSizes()         // Returns minimum font sizes
 
-// Get recommended usage
-const usage = contrast.getRecommendedUsage() // Returns: 'FLUENT_TEXT'
-
-// Get minimum font sizes
-const sizes = contrast.getMinFontSizes() // Returns recommended font sizes
+// Find specific contrast values
+const lightness = contrast.getLightnessForContrastRatio(4.5) // For WCAG AA
 ```
 
-### Color Space Conversions
+### Palette Generation
 
 ```typescript
-import { Color } from '@a_ng_d/utils-ui-color-palette'
+import { Data } from '@a_ng_d/utils-ui-color-palette'
 
-// Create a color instance
-const color = new Color({
-  sourceColor: [255, 0, 0], // Red in RGB
-  lightness: 50,
-  chromaShifting: 100,
-})
+// Configure your palette
+const config = {
+  base: {
+    name: 'My Palette',
+    colors: [/* your colors */],
+    colorSpace: 'LAB',
+    algorithmVersion: 'v3'
+  },
+  themes: [
+    {
+      id: 'light',
+      name: 'Light Theme',
+      scale: {/* lightness values */},
+      visionSimulationMode: 'NONE'
+    }
+  ],
+  meta: {/* metadata */}
+}
 
-// Convert to different color spaces
-const lchColor = color.lch()
-const oklchColor = color.oklch()
-const hsluvColor = color.hsluv()
+// Create a data instance
+const data = new Data(config)
 
-// Handle color blindness simulation
-const protanopiaColor = new Color({
-  sourceColor: [255, 0, 0],
-  visionSimulationMode: 'PROTANOPIA',
-}).setColor()
-```
-
-### Color Mixing
-
-```typescript
-import { Color } from '@a_ng_d/utils-ui-color-palette'
-
-const color = new Color({})
-
-// Mix RGB colors with alpha
-const mixed = color.mixColorsRgb(
-  [255, 0, 0, 0.5], // Semi-transparent red
-  [0, 0, 255, 1] // Solid blue
-)
-
-// Mix hex colors
-const mixedHex = color.mixColorsHex('#FF0000', '#0000FF')
+// Generate palette data
+const paletteData = data.makePaletteData()
+const fullData = data.makePaletteFullData()
 ```
 
 ## Testing
