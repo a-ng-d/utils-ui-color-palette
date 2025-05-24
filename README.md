@@ -65,7 +65,7 @@ const data = new Data({
   themes: themesConfig,
   meta: metaConfig
 })
-```x
+```
 
 ## Examples
 
