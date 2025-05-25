@@ -50,20 +50,20 @@ const color = new Color({
   sourceColor: [255, 0, 0], // RGB values
   lightness: 50,
   hueShifting: 0,
-  chromaShifting: 100
+  chromaShifting: 100,
 })
 
 // Use Contrast class for accessibility checks
 const contrast = new Contrast({
   backgroundColor: [255, 255, 255],
-  textColor: '#000000'
+  textColor: '#000000',
 })
 
 // Use Data class for palette generation
 const data = new Data({
   base: baseConfig,
   themes: themesConfig,
-  meta: metaConfig
+  meta: metaConfig,
 })
 ```
 
@@ -76,21 +76,21 @@ import { Color } from '@a_ng_d/utils-ui-color-palette'
 
 // Create a color instance
 const color = new Color({
-  sourceColor: [255, 0, 0],  // Red in RGB
+  sourceColor: [255, 0, 0], // Red in RGB
   lightness: 50,
-  chromaShifting: 100
+  chromaShifting: 100,
 })
 
 // Convert to different color spaces
-const lchColor = color.lch()        // Returns LCH color
-const oklchColor = color.oklch()    // Returns OKLCH color
-const hslColor = color.hsl()        // Returns HSL color
-const labColor = color.lab()        // Returns LAB color
+const lchColor = color.lch() // Returns LCH color
+const oklchColor = color.oklch() // Returns OKLCH color
+const hslColor = color.hsl() // Returns HSL color
+const labColor = color.lab() // Returns LAB color
 
 // Mix colors
 const mixedRgb = color.mixColorsRgb(
-  [255, 0, 0, 0.5],  // Semi-transparent red
-  [0, 0, 255, 1]     // Solid blue
+  [255, 0, 0, 0.5], // Semi-transparent red
+  [0, 0, 255, 1] // Solid blue
 )
 
 const mixedHex = color.mixColorsHex('#FF0000', '#0000FF')
@@ -104,17 +104,17 @@ import { Contrast } from '@a_ng_d/utils-ui-color-palette'
 // Create a contrast checker instance
 const contrast = new Contrast({
   backgroundColor: [255, 255, 255], // White background
-  textColor: '#000000'              // Black text
+  textColor: '#000000', // Black text
 })
 
 // Get contrast values
-const wcagContrast = contrast.getWCAGContrast()     // WCAG 2.1 contrast ratio
-const apcaContrast = contrast.getAPCAContrast()     // APCA contrast value
-const wcagScore = contrast.getWCAGScore()           // Returns: 'AAA', 'AA', or 'A'
+const wcagContrast = contrast.getWCAGContrast() // WCAG 2.1 contrast ratio
+const apcaContrast = contrast.getAPCAContrast() // APCA contrast value
+const wcagScore = contrast.getWCAGScore() // Returns: 'AAA', 'AA', or 'A'
 
 // Get accessibility recommendations
-const usage = contrast.getRecommendedUsage()        // Returns usage recommendation
-const minSizes = contrast.getMinFontSizes()         // Returns minimum font sizes
+const usage = contrast.getRecommendedUsage() // Returns usage recommendation
+const minSizes = contrast.getMinFontSizes() // Returns minimum font sizes
 
 // Find specific contrast values
 const lightness = contrast.getLightnessForContrastRatio(4.5) // For WCAG AA
@@ -129,19 +129,25 @@ import { Data } from '@a_ng_d/utils-ui-color-palette'
 const config = {
   base: {
     name: 'My Palette',
-    colors: [/* your colors */],
+    colors: [
+      /* your colors */
+    ],
     colorSpace: 'LAB',
-    algorithmVersion: 'v3'
+    algorithmVersion: 'v3',
   },
   themes: [
     {
       id: 'light',
       name: 'Light Theme',
-      scale: {/* lightness values */},
-      visionSimulationMode: 'NONE'
-    }
+      scale: {
+        /* lightness values */
+      },
+      visionSimulationMode: 'NONE',
+    },
   ],
-  meta: {/* metadata */}
+  meta: {
+    /* metadata */
+  },
 }
 
 // Create a data instance
