@@ -4,7 +4,7 @@ import {
 } from '@tps/configuration.types'
 import chroma from 'chroma-js'
 import { Hsluv } from 'hsluv'
-import { ActionsList, ColorFormat } from '@tps/model.types'
+import { ColorFormat } from '@tps/model.types'
 import { Channel, ChannelWithAlpha, HexModel } from '@tps/color.types'
 
 const colorBlindMatrices = {
@@ -456,7 +456,9 @@ export default class Color {
   }
 
   simulateColorBlindHex = (color: Channel): HexModel => {
-    const actions: ActionsList = {
+    const actions: {
+      [action: string]: () => void
+    } = {
       NONE: () => chroma(color).hex(),
       PROTANOMALY: () => {
         const transformed = applyColorMatrix(
@@ -521,7 +523,9 @@ export default class Color {
   }
 
   simulateColorBlindRgb = (color: Channel): Channel => {
-    const actions: ActionsList = {
+    const actions: {
+      [action: string]: () => void
+    } = {
       NONE: () => chroma(color).rgb(),
       PROTANOMALY: () =>
         applyColorMatrix(color, colorBlindMatrices.PROTANOMALY),
