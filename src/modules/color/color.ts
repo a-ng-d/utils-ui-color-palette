@@ -575,8 +575,10 @@ export default class Color {
   }
 
   mixColorsHex = (colorA: HexModel, colorB: HexModel): HexModel => {
-    if (!/^#([0-9A-Fa-f]{3}){1,2}$/.test(colorA)) return colorA
-    if (!/^#([0-9A-Fa-f]{3}){1,2}$/.test(colorB)) return colorB
+    const hexRegex = /^#([0-9A-Fa-f]{3}){1,2}([0-9A-Fa-f]{2})?$/
+    if (!hexRegex.test(colorA)) return colorA
+    if (!hexRegex.test(colorB)) return colorB
+
     const rgbA = chroma(colorA).rgba()
     const rgbB = chroma(colorB).rgba()
     const mixed = this.mixColorsRgb(rgbA, rgbB)
