@@ -38,7 +38,7 @@ export default class Data {
       name: base.name ?? 'UI Color Palette',
       description: base.description,
       themes: [],
-      version: process.env.VERSION ?? '1.0.0',
+      version: '2025.06',
       type: 'palette',
     }
     this.currentScale =
