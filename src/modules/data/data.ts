@@ -410,7 +410,7 @@ export default class Data {
       meta: this.meta,
       data: this.makePaletteData(),
       type: 'UI_COLOR_PALETTE',
-      version: process.env.VERSION ?? '1.0.0',
+      version: '2025.06',
     } as FullConfiguration
 
     return fullPaletteData
