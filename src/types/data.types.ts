@@ -10,7 +10,6 @@ export interface PaletteData {
   description: string
   themes: Array<PaletteDataThemeItem>
   collectionId?: string
-  version: string
   type: 'palette'
 }
 

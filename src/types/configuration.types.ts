@@ -4,6 +4,15 @@ import { ColorFormat } from './model.types'
 
 export type ThirdParty = 'COOLORS' | 'REALTIME_COLORS' | 'COLOUR_LOVERS'
 
+export interface FullConfiguration {
+  base: BaseConfiguration
+  themes: Array<ThemeConfiguration>
+  meta: MetaConfiguration
+  data: PaletteData
+  version: string
+  type: 'UI_COLOR_PALETTE'
+}
+
 export interface BaseConfiguration {
   [key: string]: string | number | boolean | object | undefined
   name: string
@@ -181,6 +190,7 @@ export interface DatesConfiguration {
   createdAt: Date | string
   updatedAt: Date | string
   publishedAt: Date | string
+  openedAt: Date | string
 }
 
 export interface PublicationConfiguration {
@@ -205,14 +215,6 @@ export interface MetaConfiguration {
   dates: DatesConfiguration
   publicationStatus: PublicationConfiguration
   creatorIdentity: CreatorConfiguration
-}
-
-export interface FullConfiguration {
-  base: BaseConfiguration
-  themes: Array<ThemeConfiguration>
-  meta: MetaConfiguration
-  data: PaletteData
-  type: 'UI_COLOR_PALETTE'
 }
 
 export interface DocumentConfiguration {

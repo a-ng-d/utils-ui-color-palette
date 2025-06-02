@@ -38,7 +38,6 @@ export default class Data {
       name: base.name ?? 'UI Color Palette',
       description: base.description,
       themes: [],
-      version: '2025.06',
       type: 'palette',
     }
     this.currentScale =
@@ -410,7 +409,6 @@ export default class Data {
       meta: this.meta,
       data: this.makePaletteData(),
       type: 'UI_COLOR_PALETTE',
-      version: '2025.06',
     } as FullConfiguration
 
     return fullPaletteData
