@@ -67,6 +67,7 @@ describe('Data', () => {
       createdAt: '2023-01-01',
       updatedAt: '2023-01-01',
       publishedAt: '2023-01-01',
+      openedAt: '2023-01-01',
     },
     creatorIdentity: {
       creatorFullName: 'Test Creator',
@@ -313,6 +314,7 @@ describe('Data', () => {
           createdAt: '2023-01-01',
           updatedAt: '2023-01-01',
           publishedAt: '2023-01-01',
+          openedAt: '2023-01-01',
         },
         creatorIdentity: {
           creatorFullName: 'Minimal Creator',
