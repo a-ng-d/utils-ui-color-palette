@@ -68,15 +68,15 @@ export interface ExtractOfBaseConfiguration {
 export type Easing =
   | 'NONE'
   | 'LINEAR'
-  | 'EASE_IN'
-  | 'EASE_OUT'
-  | 'EASE_IN_OUT'
-  | 'FAST_EASE_IN'
-  | 'FAST_EASE_OUT'
-  | 'FAST_EASE_IN_OUT'
-  | 'SLOW_EASE_IN'
-  | 'SLOW_EASE_OUT'
-  | 'SLOW_EASE_IN_OUT'
+  | 'EASEIN_SINE'
+  | 'EASEOUT_SINE'
+  | 'EASEINOUT_SINE'
+  | 'EASEIN_QUAD'
+  | 'EASEOUT_QUAD'
+  | 'EASEINOUT_QUAD'
+  | 'EASEIN_CUBIC'
+  | 'EASEOUT_CUBIC'
+  | 'EASEINOUT_CUBIC'
 
 export interface PresetConfiguration {
   id: string
