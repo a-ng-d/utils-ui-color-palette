@@ -10,7 +10,7 @@ export type {
   SourceColorConfiguration,
   ExchangeConfiguration,
   ExtractOfBaseConfiguration,
-  Easing,
+  EasingConfiguration,
   PresetConfiguration,
   ScaleConfiguration,
   LockedSourceColorsConfiguration,
