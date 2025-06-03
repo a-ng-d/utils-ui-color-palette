@@ -1,3 +1,4 @@
+import { Easing } from '@a_ng_d/figmug-utils'
 import { HexModel, RgbModel } from './color.types'
 import { PaletteData } from './data.types'
 import { ColorFormat } from './model.types'
@@ -65,18 +66,7 @@ export interface ExtractOfBaseConfiguration {
   devStatus: string | null
 }
 
-export type Easing =
-  | 'NONE'
-  | 'LINEAR'
-  | 'EASEIN_SINE'
-  | 'EASEOUT_SINE'
-  | 'EASEINOUT_SINE'
-  | 'EASEIN_QUAD'
-  | 'EASEOUT_QUAD'
-  | 'EASEINOUT_QUAD'
-  | 'EASEIN_CUBIC'
-  | 'EASEOUT_CUBIC'
-  | 'EASEINOUT_CUBIC'
+export type EasingConfiguration = Easing
 
 export interface PresetConfiguration {
   id: string
