@@ -4,7 +4,7 @@ import {
   BaseConfiguration,
   ThemeConfiguration,
   MetaConfiguration,
-  Easing,
+  EasingConfiguration,
   ColorSpaceConfiguration,
 } from '@tps/configuration.types'
 import { PaletteDataThemeItem } from '@tps/data.types'
@@ -294,7 +294,7 @@ describe('Data', () => {
         stops: [],
         min: 0,
         max: 100,
-        easing: 'LINEAR' as Easing,
+        easing: 'LINEAR' as EasingConfiguration,
       },
       shift: {
         chroma: 0,
