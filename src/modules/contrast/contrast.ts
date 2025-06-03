@@ -72,7 +72,15 @@ export default class Contrast {
     return fontLookupAPCA(this.getAPCAContrast())
   }
 
-  getRecommendedUsage = (): 'UNKNOWN' | 'AVOID' | 'NON_TEXT' | 'SPOT_TEXT' | 'HEADLINES' | 'BODY_TEXT' | 'CONTENT_TEXT' | 'FLUENT_TEXT' => {
+  getRecommendedUsage = ():
+    | 'UNKNOWN'
+    | 'AVOID'
+    | 'NON_TEXT'
+    | 'SPOT_TEXT'
+    | 'HEADLINES'
+    | 'BODY_TEXT'
+    | 'CONTENT_TEXT'
+    | 'FLUENT_TEXT' => {
     if (this.getAPCAContrast() >= 90) return 'FLUENT_TEXT'
     if (this.getAPCAContrast() >= 75 && this.getAPCAContrast() < 90)
       return 'CONTENT_TEXT'
