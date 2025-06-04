@@ -1,5 +1,10 @@
-import chroma from 'chroma-js'
 import { Hsluv } from 'hsluv'
+import chroma from 'chroma-js'
+import {
+  PaletteData,
+  PaletteDataColorItem,
+  PaletteDataThemeItem,
+} from '@tps/data.types'
 import {
   MetaConfiguration,
   BaseConfiguration,
@@ -7,13 +12,8 @@ import {
   ThemeConfiguration,
   FullConfiguration,
 } from '@tps/configuration.types'
-import {
-  PaletteData,
-  PaletteDataColorItem,
-  PaletteDataThemeItem,
-} from '@tps/data.types'
-import Color from '@modules/color/color'
 import { Channel, HexModel } from '@tps/color.types'
+import Color from '@modules/color/color'
 
 export default class Data {
   private base: BaseConfiguration

@@ -1,9 +1,9 @@
-import { Channel, ChannelWithAlpha, HexModel } from './color.types'
 import {
   ColorConfiguration,
   PresetConfiguration,
   ThemeConfiguration,
 } from './configuration.types'
+import { Channel, ChannelWithAlpha, HexModel } from './color.types'
 
 export interface PaletteData {
   name: string

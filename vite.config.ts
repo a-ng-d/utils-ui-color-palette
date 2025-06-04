@@ -1,8 +1,8 @@
+import { fileURLToPath } from 'url'
+import path, { resolve } from 'path'
 import { defineConfig } from 'vitest/config'
 import dts from 'vite-plugin-dts'
-import path, { resolve } from 'path'
 import { globSync } from 'glob'
-import { fileURLToPath } from 'url'
 
 export default defineConfig({
   plugins: [

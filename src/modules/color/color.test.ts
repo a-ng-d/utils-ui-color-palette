@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import Color from './color'
 import { VisionSimulationModeConfiguration } from '@tps/configuration.types'
 import { Channel, ChannelWithAlpha } from '@tps/color.types'
+import Color from './color'
 
 describe('Color', () => {
   const sourceColor: Channel = [255, 0, 0]

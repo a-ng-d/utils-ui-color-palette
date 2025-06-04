@@ -1,5 +1,5 @@
-import { APCAcontrast, fontLookupAPCA, sRGBtoY } from 'apca-w3'
 import chroma from 'chroma-js'
+import { APCAcontrast, fontLookupAPCA, sRGBtoY } from 'apca-w3'
 import { Channel, HexModel, RgbModel } from '@tps/color.types'
 
 export default class Contrast {

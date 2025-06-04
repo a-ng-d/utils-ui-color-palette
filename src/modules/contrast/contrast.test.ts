@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import Contrast from './contrast'
 import { Channel, HexModel } from '@tps/color.types'
+import Contrast from './contrast'
 
 describe('Contrast', () => {
   const backgroundColor: Channel = [255, 255, 255] // White

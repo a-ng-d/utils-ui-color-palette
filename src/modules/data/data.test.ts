@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import Data from './data'
+import { PaletteDataThemeItem } from '@tps/data.types'
 import {
   BaseConfiguration,
   ThemeConfiguration,
@@ -7,7 +7,7 @@ import {
   EasingConfiguration,
   ColorSpaceConfiguration,
 } from '@tps/configuration.types'
-import { PaletteDataThemeItem } from '@tps/data.types'
+import Data from './data'
 
 describe('Data', () => {
   const mockBase: BaseConfiguration = {

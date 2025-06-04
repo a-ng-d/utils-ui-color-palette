@@ -1,10 +1,10 @@
+import { Hsluv } from 'hsluv'
+import chroma from 'chroma-js'
+import { ColorFormat } from '@tps/model.types'
 import {
   AlgorithmVersionConfiguration,
   VisionSimulationModeConfiguration,
 } from '@tps/configuration.types'
-import chroma from 'chroma-js'
-import { Hsluv } from 'hsluv'
-import { ColorFormat } from '@tps/model.types'
 import { Channel, ChannelWithAlpha, HexModel } from '@tps/color.types'
 
 const colorBlindMatrices = {

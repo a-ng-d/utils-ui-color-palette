@@ -1,7 +1,7 @@
 import { Easing } from '@a_ng_d/figmug-utils'
-import { HexModel, RgbModel } from './color.types'
-import { PaletteData } from './data.types'
 import { ColorFormat } from './model.types'
+import { PaletteData } from './data.types'
+import { HexModel, RgbModel } from './color.types'
 
 export type ThirdParty = 'COOLORS' | 'REALTIME_COLORS' | 'COLOUR_LOVERS'
 
