@@ -9,7 +9,7 @@ Core utilities library for UI Color Palette - a color management plugin for desi
 
 UI Color Palette is available for:
 
-- Figma - Create and manage color primivites directly in your Figma designs
+- Figma - Create and manage color primitives directly in your Figma designs
 - FigJam - Collaborate on color decisions with your team
 - Penpot - Open-source design tool alternative with full color management support
 
