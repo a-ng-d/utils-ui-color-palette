@@ -18,7 +18,7 @@ import Color from '@modules/color/color'
 export default class Data {
   private base: BaseConfiguration
   private themes: Array<ThemeConfiguration>
-  private meta: MetaConfiguration
+  private meta?: MetaConfiguration
   private paletteData: PaletteData
   private currentScale: ScaleConfiguration
 
@@ -29,7 +29,7 @@ export default class Data {
   }: {
     base: BaseConfiguration
     themes: Array<ThemeConfiguration>
-    meta: MetaConfiguration
+    meta?: MetaConfiguration
   }) {
     this.base = base
     this.themes = themes
