@@ -80,7 +80,7 @@ export interface ExternalPalettes {
   description: string
   preset: PresetConfiguration
   shift: ShiftConfiguration
-  are_source_colors_locked?: LockedSourceColorsConfiguration
+  are_source_colors_locked: LockedSourceColorsConfiguration
   colors: Array<ColorConfiguration>
   themes: Array<ThemeConfiguration>
   color_space: ColorSpaceConfiguration
