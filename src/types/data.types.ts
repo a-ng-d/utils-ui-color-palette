@@ -77,14 +77,14 @@ export interface ColourLovers {
 export interface ExternalPalettes {
   palette_id: string
   name: string
-  description?: string
+  description: string
   preset: PresetConfiguration
-  shift?: ShiftConfiguration
+  shift: ShiftConfiguration
   are_source_colors_locked?: LockedSourceColorsConfiguration
   colors: Array<ColorConfiguration>
   themes: Array<ThemeConfiguration>
-  color_space?: ColorSpaceConfiguration
-  algorithm_version?: AlgorithmVersionConfiguration
+  color_space: ColorSpaceConfiguration
+  algorithm_version: AlgorithmVersionConfiguration
   creator_avatar: string
   creator_full_name: string
   creator_id: string
