@@ -4,6 +4,7 @@ import {
   ColorSpaceConfiguration,
   LockedSourceColorsConfiguration,
   PresetConfiguration,
+  ShiftConfiguration,
   ThemeConfiguration,
 } from './configuration.types'
 import { Channel, ChannelWithAlpha, HexModel } from './color.types'
@@ -78,6 +79,7 @@ export interface ExternalPalettes {
   name: string
   description?: string
   preset: PresetConfiguration
+  shift?: ShiftConfiguration
   are_source_colors_locked?: LockedSourceColorsConfiguration
   colors: Array<ColorConfiguration>
   themes: Array<ThemeConfiguration>
