@@ -12,6 +12,7 @@ export type {
   ExtractOfBaseConfiguration,
   EasingConfiguration,
   PresetConfiguration,
+  ShiftConfiguration,
   ScaleConfiguration,
   LockedSourceColorsConfiguration,
   ColorConfiguration,
