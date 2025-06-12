@@ -37,6 +37,8 @@ export type {
   PaletteDataThemeItem,
   PaletteDataColorItem,
   PaletteDataShadeItem,
+  ExternalPalettes,
+  ColourLovers,
 } from '@tps/data.types'
 export type { ColorFormat } from '@tps/model.types'
 
