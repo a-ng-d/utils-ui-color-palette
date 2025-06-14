@@ -407,7 +407,6 @@ export default class Data {
       base: this.base,
       themes: this.themes,
       meta: this.meta,
-      data: this.makePaletteData(),
       type: 'UI_COLOR_PALETTE',
     } as FullConfiguration
 
