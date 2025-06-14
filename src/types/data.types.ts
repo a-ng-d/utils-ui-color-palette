@@ -49,7 +49,8 @@ export interface PaletteDataShadeItem {
   alpha?: number
   backgroundColor?: Channel
   mixedColor?: Channel
-  styleId: string
+  styleId?: string
+  variableId?: string
   isClosestToRef?: boolean
   isSourceColorLocked?: boolean
   isTransparent?: boolean

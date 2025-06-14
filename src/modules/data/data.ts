@@ -65,6 +65,26 @@ export default class Data {
     return styleId === undefined ? '' : styleId
   }
 
+  searchForShadeVariableId = (
+    themes: Array<PaletteDataThemeItem>,
+    themeId: string,
+    colorId: string,
+    shadeName: string
+  ) => {
+    const themeMatch = themes.find((theme) => theme.id === themeId),
+      colorMatch =
+        themeMatch === undefined
+          ? undefined
+          : themeMatch.colors.find((color) => color.id === colorId),
+      shadeMatch =
+        colorMatch === undefined
+          ? undefined
+          : colorMatch.shades.find((shade) => shade.name === shadeName),
+      variableId = shadeMatch === undefined ? '' : shadeMatch.variableId
+
+    return variableId === undefined ? '' : variableId
+  }
+
   makePaletteData = (previousData?: PaletteData) => {
     this.themes.forEach((theme) => {
       const paletteDataThemeItem: PaletteDataThemeItem = {
@@ -254,6 +274,12 @@ export default class Data {
             color.id,
             'source'
           ),
+          variableId: this.searchForShadeVariableId(
+            previousData?.themes ?? this.paletteData.themes,
+            theme.id,
+            color.id,
+            'source'
+          ),
           type: 'source color',
         })
 
@@ -379,6 +405,12 @@ export default class Data {
                   )
                 : undefined,
             styleId: this.searchForShadeStyleId(
+              previousData?.themes ?? this.paletteData.themes,
+              theme.id,
+              color.id,
+              scaleName
+            ),
+            variableId: this.searchForShadeVariableId(
               previousData?.themes ?? this.paletteData.themes,
               theme.id,
               color.id,
