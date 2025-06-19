@@ -31,6 +31,7 @@ export type {
   FullConfiguration,
   DocumentConfiguration,
   ThirdParty,
+  LibraryIds,
 } from '@tps/configuration.types'
 export type {
   PaletteData,
