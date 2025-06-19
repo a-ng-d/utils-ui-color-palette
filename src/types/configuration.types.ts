@@ -8,7 +8,7 @@ export interface FullConfiguration {
   base: BaseConfiguration
   themes: Array<ThemeConfiguration>
   meta: MetaConfiguration
-  libraryIds?: LibraryIds
+  libraryIds?: Array<LibraryIds>
   version: string
   type: 'UI_COLOR_PALETTE'
 }
