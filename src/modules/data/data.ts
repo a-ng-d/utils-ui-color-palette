@@ -1,3 +1,4 @@
+import { uid } from 'uid'
 import { Hsluv } from 'hsluv'
 import chroma from 'chroma-js'
 import {
@@ -214,6 +215,7 @@ export default class Data {
         sourceHsluv.rgbToHsluv()
 
         paletteDataColorItem.shades.push({
+          id: uid(),
           name: 'source',
           description: 'Source color',
           hex: chroma(sourceColor).hex(),
@@ -279,6 +281,7 @@ export default class Data {
           newHsluv.rgbToHsluv()
 
           paletteDataColorItem.shades.push({
+            id: uid(),
             name: scaleName,
             description: `Shade color with ${typeof scaledColor[0][1] === 'number' ? scaledColor[0][1].toFixed(1) : scaledColor[0][1]}% of ${
               color.alpha.isEnabled ? 'opacity' : 'lightness'
@@ -402,14 +405,12 @@ export default class Data {
                   color.name
                 }`
 
-          let previousItem = previousData?.find(
-            (item) => item.path === path && item.name === shade.name
+          const previousItem = previousData?.find(
+            (item) => item.id === shade.id
           )
-          if (!previousItem) {
-            previousItem = previousData?.find((item) => item.hex === shade.hex)
-          }
 
           return {
+            id: shade.id,
             name: shade.name,
             path: path,
             alpha: shade.alpha,

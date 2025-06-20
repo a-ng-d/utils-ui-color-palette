@@ -17,6 +17,7 @@ export interface PaletteData {
 }
 
 export interface LibraryData {
+  id: string
   name: string
   path: string
   hex?: HexModel
@@ -46,6 +47,7 @@ export interface PaletteDataColorItem {
 }
 
 export interface PaletteDataShadeItem {
+  id: string
   name: string
   description: string
   hex: HexModel
