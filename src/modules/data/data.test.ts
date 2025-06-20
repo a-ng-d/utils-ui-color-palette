@@ -1,5 +1,4 @@
 import { describe, it, expect } from 'vitest'
-import { PaletteDataThemeItem } from '@tps/data.types'
 import {
   BaseConfiguration,
   ThemeConfiguration,
@@ -87,55 +86,6 @@ describe('Data', () => {
       meta: mockMeta,
     })
     expect(data).toBeDefined()
-  })
-
-  it('should return correct styleId from searchForShadeStyleId', () => {
-    const data = new Data({
-      base: mockBase,
-      themes: [mockTheme],
-      meta: mockMeta,
-    })
-
-    const themes = [
-      {
-        id: 'theme1',
-        name: 'Test Theme',
-        description: 'A test theme',
-        type: 'default theme',
-        colors: [
-          {
-            id: 'color1',
-            name: 'Test Color',
-            description: 'A test color',
-            shades: [
-              {
-                name: 'shade1',
-                styleId: 'test-style-id',
-              },
-            ],
-          },
-        ],
-      },
-    ] as Array<PaletteDataThemeItem>
-
-    const result = data.searchForShadeStyleId(
-      themes,
-      'theme1',
-      'color1',
-      'shade1'
-    )
-    expect(result).toBe('test-style-id')
-  })
-
-  it('should return empty string for non-existent shade in searchForShadeStyleId', () => {
-    const data = new Data({
-      base: mockBase,
-      themes: [mockTheme],
-      meta: mockMeta,
-    })
-
-    const result = data.searchForShadeStyleId([], 'theme1', 'color1', 'shade1')
-    expect(result).toBe('')
   })
 
   it('should generate palette data with makePaletteData', () => {

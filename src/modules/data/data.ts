@@ -1,6 +1,7 @@
 import { Hsluv } from 'hsluv'
 import chroma from 'chroma-js'
 import {
+  LibraryData,
   PaletteData,
   PaletteDataColorItem,
   PaletteDataThemeItem,
@@ -45,47 +46,7 @@ export default class Data {
       ({} as ScaleConfiguration)
   }
 
-  searchForShadeStyleId = (
-    themes: Array<PaletteDataThemeItem>,
-    themeId: string,
-    colorId: string,
-    shadeName: string
-  ) => {
-    const themeMatch = themes.find((theme) => theme.id === themeId),
-      colorMatch =
-        themeMatch === undefined
-          ? undefined
-          : themeMatch.colors.find((color) => color.id === colorId),
-      shadeMatch =
-        colorMatch === undefined
-          ? undefined
-          : colorMatch.shades.find((shade) => shade.name === shadeName),
-      styleId = shadeMatch === undefined ? '' : shadeMatch.styleId
-
-    return styleId === undefined ? '' : styleId
-  }
-
-  searchForShadeVariableId = (
-    themes: Array<PaletteDataThemeItem>,
-    themeId: string,
-    colorId: string,
-    shadeName: string
-  ) => {
-    const themeMatch = themes.find((theme) => theme.id === themeId),
-      colorMatch =
-        themeMatch === undefined
-          ? undefined
-          : themeMatch.colors.find((color) => color.id === colorId),
-      shadeMatch =
-        colorMatch === undefined
-          ? undefined
-          : colorMatch.shades.find((shade) => shade.name === shadeName),
-      variableId = shadeMatch === undefined ? '' : shadeMatch.variableId
-
-    return variableId === undefined ? '' : variableId
-  }
-
-  makePaletteData = (previousData?: PaletteData) => {
+  makePaletteData = () => {
     this.themes.forEach((theme) => {
       const paletteDataThemeItem: PaletteDataThemeItem = {
         id: theme.id,
@@ -268,18 +229,6 @@ export default class Data {
             sourceHsluv.hsluv_s,
             sourceHsluv.hsluv_l,
           ],
-          styleId: this.searchForShadeStyleId(
-            previousData?.themes ?? this.paletteData.themes,
-            theme.id,
-            color.id,
-            'source'
-          ),
-          variableId: this.searchForShadeVariableId(
-            previousData?.themes ?? this.paletteData.themes,
-            theme.id,
-            color.id,
-            'source'
-          ),
           type: 'source color',
         })
 
@@ -404,18 +353,6 @@ export default class Data {
                     [...(scaledColor[2] as Channel), 1]
                   )
                 : undefined,
-            styleId: this.searchForShadeStyleId(
-              previousData?.themes ?? this.paletteData.themes,
-              theme.id,
-              color.id,
-              scaleName
-            ),
-            variableId: this.searchForShadeVariableId(
-              previousData?.themes ?? this.paletteData.themes,
-              theme.id,
-              color.id,
-              scaleName
-            ),
             isClosestToRef: distance < 4 && !this.base.areSourceColorsLocked,
             isSourceColorLocked:
               index === minDistanceIndex &&
@@ -434,10 +371,75 @@ export default class Data {
     return this.paletteData
   }
 
+  makeLibraryData = (
+    options?: Array<
+      | 'collection_id'
+      | 'mode_id'
+      | 'variable_id'
+      | 'style_id'
+      | 'gl'
+      | 'hex'
+      | 'description'
+    >,
+    previousData?: Array<LibraryData>
+  ) => {
+    const paletteData = this.makePaletteData()
+    const workingThemes =
+      paletteData.themes.filter((theme) => theme.type === 'custom theme')
+        .length === 0
+        ? paletteData.themes.filter((theme) => theme.type === 'default theme')
+        : paletteData.themes.filter((theme) => theme.type === 'custom theme')
+
+    const libraryData: Array<LibraryData> = workingThemes.flatMap((theme) => {
+      return theme.colors.flatMap((color) =>
+        color.shades.flatMap((shade) => {
+          const path =
+            workingThemes[0].type === 'custom theme'
+              ? `${
+                  paletteData.name === '' ? '' : paletteData.name + ' / '
+                }${theme.name} / ${color.name}`
+              : `${paletteData.name === '' ? '' : paletteData.name} / ${
+                  color.name
+                }`
+
+          const previousItem = previousData?.find(
+            (item) => item.path === path && item.name === shade.name
+          )
+
+          return {
+            name: shade.name,
+            path: path,
+            alpha: shade.alpha,
+            ...(options?.includes('hex') && { hex: shade.hex }),
+            ...(options?.includes('gl') && { gl: shade.gl }),
+            ...(options?.includes('description') && {
+              description: shade.description,
+            }),
+            ...(options?.includes('collection_id') && {
+              collectionId: previousItem?.collectionId,
+            }),
+            ...(options?.includes('mode_id') && {
+              modeId: previousItem?.modeId,
+            }),
+            ...(options?.includes('variable_id') && {
+              variableId: previousItem?.variableId,
+            }),
+            ...(options?.includes('style_id') && {
+              styleId: previousItem?.styleId,
+            }),
+          }
+        })
+      )
+    })
+
+    return libraryData
+  }
+
   makePaletteFullData = () => {
     const fullPaletteData = {
       base: this.base,
       themes: this.themes,
+      libraryData: this.makeLibraryData(),
       meta: this.meta,
       type: 'UI_COLOR_PALETTE',
     } as FullConfiguration

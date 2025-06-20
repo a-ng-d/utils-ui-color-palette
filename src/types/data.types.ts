@@ -13,8 +13,20 @@ export interface PaletteData {
   name: string
   description: string
   themes: Array<PaletteDataThemeItem>
-  collectionId?: string
   type: 'palette'
+}
+
+export interface LibraryData {
+  name: string
+  path: string
+  hex?: HexModel
+  description?: string
+  gl?: ChannelWithAlpha
+  alpha?: number
+  collectionId?: string
+  modeId?: string
+  variableId?: string
+  styleId?: string
 }
 
 export interface PaletteDataThemeItem {
@@ -22,7 +34,6 @@ export interface PaletteDataThemeItem {
   name: string
   description: string
   colors: Array<PaletteDataColorItem>
-  modeId?: string
   type: 'default theme' | 'custom theme'
 }
 
@@ -49,8 +60,6 @@ export interface PaletteDataShadeItem {
   alpha?: number
   backgroundColor?: Channel
   mixedColor?: Channel
-  styleId?: string
-  variableId?: string
   isClosestToRef?: boolean
   isSourceColorLocked?: boolean
   isTransparent?: boolean

@@ -1,5 +1,6 @@
 import { Easing } from '@a_ng_d/figmug-utils'
 import { ColorFormat } from './model.types'
+import { LibraryData } from './data.types'
 import { HexModel, RgbModel } from './color.types'
 
 export type ThirdParty = 'COOLORS' | 'REALTIME_COLORS' | 'COLOUR_LOVERS'
@@ -8,7 +9,7 @@ export interface FullConfiguration {
   base: BaseConfiguration
   themes: Array<ThemeConfiguration>
   meta: MetaConfiguration
-  libraryIds?: Array<LibraryIds>
+  libraryData: Array<LibraryData>
   version: string
   type: 'UI_COLOR_PALETTE'
 }
@@ -211,12 +212,4 @@ export interface DocumentConfiguration {
   view?: ViewConfiguration
   isLinkedToPalette?: boolean
   updatedAt?: Date | string
-}
-
-export interface LibraryIds {
-  name: string
-  collectionId?: string
-  modeId?: string
-  variableId?: string
-  styleId?: string
 }
