@@ -402,9 +402,12 @@ export default class Data {
                   color.name
                 }`
 
-          const previousItem = previousData?.find(
+          let previousItem = previousData?.find(
             (item) => item.path === path && item.name === shade.name
           )
+          if (!previousItem) {
+            previousItem = previousData?.find((item) => item.hex === shade.hex)
+          }
 
           return {
             name: shade.name,
