@@ -410,7 +410,7 @@ export default class Data {
           )
 
           return {
-            id: shade.id,
+            id: previousItem?.id || shade.id,
             name: shade.name,
             path: path,
             alpha: shade.alpha,
