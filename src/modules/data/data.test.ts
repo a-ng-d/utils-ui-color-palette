@@ -282,4 +282,38 @@ describe('Data', () => {
     expect(result).toBeDefined()
     expect(result.type).toBe('UI_COLOR_PALETTE')
   })
+
+  it('should retrieve styleId, variableId, collectionId, and modeId from previousData', () => {
+    const data = new Data({
+      base: mockBase,
+      themes: [mockTheme],
+      meta: mockMeta,
+    })
+
+    const initialLibraryData = data.makeLibraryData()
+    const firstShade = initialLibraryData[0]
+    const previousData = [
+      {
+        ...firstShade,
+        styleId: 'style-123',
+        variableId: 'var-456',
+        collectionId: 'coll-789',
+        modeId: 'mode-101',
+      },
+    ]
+
+    const result = data.makeLibraryData(
+      ['style_id', 'variable_id', 'collection_id', 'mode_id'],
+      previousData
+    )
+
+    const found = result.find(
+      (item) => item.path === firstShade.path && item.name === firstShade.name
+    )
+    expect(found).toBeDefined()
+    expect(found?.styleId).toBe('style-123')
+    expect(found?.variableId).toBe('var-456')
+    expect(found?.collectionId).toBe('coll-789')
+    expect(found?.modeId).toBe('mode-101')
+  })
 })
