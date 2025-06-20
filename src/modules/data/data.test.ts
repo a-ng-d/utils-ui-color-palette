@@ -317,7 +317,7 @@ describe('Data', () => {
     expect(found?.modeId).toBe('mode-101')
   })
 
-  it('should retrieve styleId if name or path changes but id is the same', () => {
+  it('should retrieve styleId if name change but id is the same', () => {
     const data = new Data({
       base: mockBase,
       themes: [mockTheme],
@@ -329,8 +329,59 @@ describe('Data', () => {
     const previousData = [
       {
         ...firstShade,
-        name: 'Shade name',
-        path: 'Theme name / Color name',
+        name: 'Old shade name',
+        styleId: 'style-123',
+      },
+    ]
+
+    const result = data.makeLibraryData(['style_id'], previousData)
+
+    const found = result.find(
+      (item) => item.path === firstShade.path && item.name === firstShade.name
+    )
+    expect(found).toBeDefined()
+    expect(found?.styleId).toBe('style-123')
+  })
+
+  it('should retrieve styleId if path change but id is the same', () => {
+    const data = new Data({
+      base: mockBase,
+      themes: [mockTheme],
+      meta: mockMeta,
+    })
+
+    const initialLibraryData = data.makeLibraryData()
+    const firstShade = initialLibraryData[0]
+    const previousData = [
+      {
+        ...firstShade,
+        path: 'Old theme name / Old color name',
+        styleId: 'style-123',
+      },
+    ]
+
+    const result = data.makeLibraryData(['style_id'], previousData)
+
+    const found = result.find(
+      (item) => item.path === firstShade.path && item.name === firstShade.name
+    )
+    expect(found).toBeDefined()
+    expect(found?.styleId).toBe('style-123')
+  })
+
+  it('should retrieve styleId if hex change but id is the same', () => {
+    const data = new Data({
+      base: mockBase,
+      themes: [mockTheme],
+      meta: mockMeta,
+    })
+
+    const initialLibraryData = data.makeLibraryData()
+    const firstShade = initialLibraryData[0]
+    const previousData = [
+      {
+        ...firstShade,
+        hex: '#3465FE',
         styleId: 'style-123',
       },
     ]
