@@ -401,15 +401,14 @@ export default class Data {
               : `${paletteData.name === '' ? '' : paletteData.name} / ${
                   color.name
                 }`
+          const generatedId = `${theme.id}:${color.id}:${shade.name}`
 
           const previousItem = previousData?.find(
-            (item) =>
-              (item.name === shade.name && item.path === path) ||
-              (item.name === shade.name && item.hex === shade.hex) ||
-              (item.path === path && item.hex === shade.hex)
+            (item) => item.id === generatedId
           )
 
           return {
+            id: generatedId,
             name: shade.name,
             path: path,
             hex: shade.hex,

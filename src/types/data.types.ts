@@ -17,6 +17,7 @@ export interface PaletteData {
 }
 
 export interface LibraryData {
+  id: string
   name: string
   path: string
   hex?: HexModel
