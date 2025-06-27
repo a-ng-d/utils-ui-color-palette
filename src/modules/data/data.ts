@@ -443,6 +443,7 @@ export default class Data {
       themes: this.themes,
       libraryData: this.makeLibraryData(model),
       meta: this.meta,
+      version: '2025.06',
       type: 'UI_COLOR_PALETTE',
     } as FullConfiguration
 
