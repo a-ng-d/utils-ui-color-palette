@@ -415,7 +415,7 @@ export default class Data {
             ...(options?.includes('hex') && { hex: shade.hex }),
             ...(options?.includes('gl') && { gl: shade.gl }),
             ...(options?.includes('description') && {
-              description: shade.description,
+              description: `${color.description !== '' ? color.description + '・' : ''}${shade.description}`,
             }),
             ...(options?.includes('collection_id') && {
               collectionId: previousItem?.collectionId,
