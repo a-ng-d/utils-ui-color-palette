@@ -411,8 +411,8 @@ export default class Data {
             id: generatedId,
             name: shade.name,
             path: path,
-            hex: shade.hex,
-            alpha: shade.alpha,
+            alpha: shade.alpha ?? 1,
+            ...(options?.includes('hex') && { hex: shade.hex }),
             ...(options?.includes('gl') && { gl: shade.gl }),
             ...(options?.includes('description') && {
               description: shade.description,
@@ -437,11 +437,11 @@ export default class Data {
     return libraryData
   }
 
-  makePaletteFullData = () => {
+  makePaletteFullData = (model: ['hex' | 'gl'] = ['hex']) => {
     const fullPaletteData = {
       base: this.base,
       themes: this.themes,
-      libraryData: this.makeLibraryData(),
+      libraryData: this.makeLibraryData(model),
       meta: this.meta,
       type: 'UI_COLOR_PALETTE',
     } as FullConfiguration
