@@ -396,9 +396,9 @@ export default class Data {
           const path =
             workingThemes[0].type === 'custom theme'
               ? `${
-                  paletteData.name === '' ? '' : paletteData.name + ' / '
-                }${theme.name} / ${color.name}`
-              : `${paletteData.name === '' ? '' : paletteData.name} / ${
+                  paletteData.name === '' ? '' : paletteData.name + '/'
+                }${theme.name}/${color.name}`
+              : `${paletteData.name === '' ? '' : paletteData.name}/${
                   color.name
                 }`
           const generatedId = `${theme.id}:${color.id}:${shade.name}`
