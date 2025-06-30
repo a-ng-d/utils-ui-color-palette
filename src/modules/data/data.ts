@@ -390,49 +390,51 @@ export default class Data {
         ? paletteData.themes.filter((theme) => theme.type === 'default theme')
         : paletteData.themes.filter((theme) => theme.type === 'custom theme')
 
-    const libraryData: Array<LibraryData> = workingThemes.flatMap((theme) => {
-      return theme.colors.flatMap((color) =>
-        color.shades.flatMap((shade) => {
-          const path =
-            workingThemes[0].type === 'custom theme'
-              ? `${
-                  paletteData.name === '' ? '' : paletteData.name + '/'
-                }${theme.name}/${color.name}`
-              : `${paletteData.name === '' ? '' : paletteData.name}/${
-                  color.name
-                }`
-          const generatedId = `${theme.id}:${color.id}:${shade.name}`
+    const libraryData: Array<LibraryData> = paletteData.themes.flatMap(
+      (theme) => {
+        return theme.colors.flatMap((color) =>
+          color.shades.flatMap((shade) => {
+            const path =
+              workingThemes[0].type === 'custom theme'
+                ? `${
+                    paletteData.name === '' ? '' : paletteData.name + '/'
+                  }${theme.name}/${color.name}`
+                : `${paletteData.name === '' ? '' : paletteData.name}/${
+                    color.name
+                  }`
+            const generatedId = `${theme.id}:${color.id}:${shade.name}`
 
-          const previousItem = previousData?.find(
-            (item) => item.id === generatedId
-          )
+            const previousItem = previousData?.find(
+              (item) => item.id === generatedId
+            )
 
-          return {
-            id: generatedId,
-            name: shade.name,
-            path: path,
-            alpha: shade.alpha ?? 1,
-            ...(options?.includes('hex') && { hex: shade.hex }),
-            ...(options?.includes('gl') && { gl: shade.gl }),
-            ...(options?.includes('description') && {
-              description: `${color.description !== '' ? color.description + '・' : ''}${shade.description}`,
-            }),
-            ...(options?.includes('collection_id') && {
-              collectionId: previousItem?.collectionId,
-            }),
-            ...(options?.includes('mode_id') && {
-              modeId: previousItem?.modeId,
-            }),
-            ...(options?.includes('variable_id') && {
-              variableId: previousItem?.variableId,
-            }),
-            ...(options?.includes('style_id') && {
-              styleId: previousItem?.styleId,
-            }),
-          }
-        })
-      )
-    })
+            return {
+              id: generatedId,
+              name: shade.name,
+              path: path,
+              alpha: shade.alpha ?? 1,
+              ...(options?.includes('hex') && { hex: shade.hex }),
+              ...(options?.includes('gl') && { gl: shade.gl }),
+              ...(options?.includes('description') && {
+                description: `${color.description !== '' ? color.description + '・' : ''}${shade.description}`,
+              }),
+              ...(options?.includes('collection_id') && {
+                collectionId: previousItem?.collectionId,
+              }),
+              ...(options?.includes('mode_id') && {
+                modeId: previousItem?.modeId,
+              }),
+              ...(options?.includes('variable_id') && {
+                variableId: previousItem?.variableId,
+              }),
+              ...(options?.includes('style_id') && {
+                styleId: previousItem?.styleId,
+              }),
+            }
+          })
+        )
+      }
+    )
 
     return libraryData
   }
