@@ -384,34 +384,23 @@ export default class Data {
     previousData?: Array<LibraryData>
   ) => {
     const paletteData = this.makePaletteData()
-    const workingThemes =
-      paletteData.themes.filter((theme) => theme.type === 'custom theme')
-        .length === 0
-        ? paletteData.themes.filter((theme) => theme.type === 'default theme')
-        : paletteData.themes.filter((theme) => theme.type === 'custom theme')
 
     const libraryData: Array<LibraryData> = paletteData.themes.flatMap(
       (theme) => {
         return theme.colors.flatMap((color) =>
           color.shades.flatMap((shade) => {
-            const path =
-              workingThemes[0].type === 'custom theme'
-                ? `${
-                    paletteData.name === '' ? '' : paletteData.name + '/'
-                  }${theme.name}/${color.name}`
-                : `${paletteData.name === '' ? '' : paletteData.name}/${
-                    color.name
-                  }`
             const generatedId = `${theme.id}:${color.id}:${shade.name}`
-
             const previousItem = previousData?.find(
               (item) => item.id === generatedId
             )
 
             return {
               id: generatedId,
-              name: shade.name,
-              path: path,
+              paletteName: paletteData.name,
+              themeName: theme.name,
+              colorName: color.name,
+              shadeName: shade.name,
+              type: theme.type,
               alpha: shade.alpha ?? 1,
               ...(options?.includes('hex') && { hex: shade.hex }),
               ...(options?.includes('gl') && { gl: shade.gl }),

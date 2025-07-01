@@ -18,8 +18,11 @@ export interface PaletteData {
 
 export interface LibraryData {
   id: string
-  name: string
-  path: string
+  paletteName: string
+  themeName: string
+  colorName: string
+  shadeName: string
+  type: 'default theme' | 'custom theme'
   hex?: HexModel
   description?: string
   gl?: ChannelWithAlpha
