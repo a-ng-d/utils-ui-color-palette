@@ -401,7 +401,7 @@ export default class Data {
               themeName: theme.name,
               colorName: color.name,
               shadeName: shade.name,
-              ...(options?.includes('hex') && { alpha: shade.alpha ?? 1 }),
+              ...(options?.includes('alpha') && { alpha: shade.alpha ?? 1 }),
               ...(options?.includes('hex') && { hex: shade.hex }),
               ...(options?.includes('gl') && { gl: shade.gl }),
               ...(options?.includes('description') && {
