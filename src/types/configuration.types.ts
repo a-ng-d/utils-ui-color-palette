@@ -194,9 +194,7 @@ export interface CreatorConfiguration {
   creatorId: string
 }
 
-export interface StatusConfiguration {
-  isReadyToDev: boolean
-}
+export type StatusConfiguration = 'IS_READY_TO_DEV' | 'DEFAULT'
 
 export interface UserConfiguration {
   id: string
