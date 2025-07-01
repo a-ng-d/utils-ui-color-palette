@@ -307,9 +307,7 @@ describe('Data', () => {
       previousData
     )
 
-    const found = result.find(
-      (item) => item.path === firstShade.path && item.name === firstShade.name
-    )
+    const found = result.find((item) => item.id === firstShade.id)
     expect(found).toBeDefined()
     expect(found?.styleId).toBe('style-123')
     expect(found?.variableId).toBe('var-456')
@@ -336,9 +334,7 @@ describe('Data', () => {
 
     const result = data.makeLibraryData(['style_id'], previousData)
 
-    const found = result.find(
-      (item) => item.path === firstShade.path && item.name === firstShade.name
-    )
+    const found = result.find((item) => item.id === firstShade.id)
     expect(found).toBeDefined()
     expect(found?.styleId).toBe('style-123')
   })
@@ -362,9 +358,7 @@ describe('Data', () => {
 
     const result = data.makeLibraryData(['style_id'], previousData)
 
-    const found = result.find(
-      (item) => item.path === firstShade.path && item.name === firstShade.name
-    )
+    const found = result.find((item) => item.id === firstShade.id)
     expect(found).toBeDefined()
     expect(found?.styleId).toBe('style-123')
   })
@@ -388,9 +382,7 @@ describe('Data', () => {
 
     const result = data.makeLibraryData(['style_id'], previousData)
 
-    const found = result.find(
-      (item) => item.path === firstShade.path && item.name === firstShade.name
-    )
+    const found = result.find((item) => item.id === firstShade.id)
     expect(found).toBeDefined()
     expect(found?.styleId).toBe('style-123')
   })
