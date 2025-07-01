@@ -194,7 +194,7 @@ export interface CreatorConfiguration {
   creatorId: string
 }
 
-export interface DevStatusConfiguration {
+export interface StatusConfiguration {
   isReadyToDev: boolean
 }
 
