@@ -194,6 +194,10 @@ export interface CreatorConfiguration {
   creatorId: string
 }
 
+export interface DevStatusConfiguration {
+  isReadyToDev: boolean
+}
+
 export interface UserConfiguration {
   id: string
   fullName: string

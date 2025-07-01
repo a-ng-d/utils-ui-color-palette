@@ -26,6 +26,7 @@ export type {
   DatesConfiguration,
   PublicationConfiguration,
   CreatorConfiguration,
+  DevStatusConfiguration,
   UserConfiguration,
   MetaConfiguration,
   FullConfiguration,
