@@ -380,6 +380,7 @@ export default class Data {
       | 'gl'
       | 'hex'
       | 'description'
+      | 'alpha'
     >,
     previousData?: Array<LibraryData>
   ) => {
@@ -400,8 +401,7 @@ export default class Data {
               themeName: theme.name,
               colorName: color.name,
               shadeName: shade.name,
-              type: theme.type,
-              alpha: shade.alpha ?? 1,
+              ...(options?.includes('hex') && { alpha: shade.alpha ?? 1 }),
               ...(options?.includes('hex') && { hex: shade.hex }),
               ...(options?.includes('gl') && { gl: shade.gl }),
               ...(options?.includes('description') && {
@@ -428,11 +428,11 @@ export default class Data {
     return libraryData
   }
 
-  makePaletteFullData = (model: ['hex' | 'gl'] = ['hex']) => {
+  makePaletteFullData = () => {
     const fullPaletteData = {
       base: this.base,
       themes: this.themes,
-      libraryData: this.makeLibraryData(model),
+      libraryData: this.makeLibraryData(),
       meta: this.meta,
       version: '2025.06',
       type: 'UI_COLOR_PALETTE',

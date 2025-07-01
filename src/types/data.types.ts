@@ -22,7 +22,6 @@ export interface LibraryData {
   themeName: string
   colorName: string
   shadeName: string
-  type: 'default theme' | 'custom theme'
   hex?: HexModel
   description?: string
   gl?: ChannelWithAlpha
