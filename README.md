@@ -170,14 +170,15 @@ yarn test
 
 Current test coverage results:
 
-```
-File          | % Stmts | % Branch | % Funcs | % Lines
---------------|---------|----------|---------|--------
-All files     |   78.37 |     80.5 |   77.58 |   78.37
- color.ts     |   72.02 |    72.36 |   69.04 |   72.02
- contrast.ts  |      89 |    93.02 |     100 |      89
- data.ts      |   83.25 |    81.19 |     100 |   83.25
-```
+File          | % Stmts | % Branch | % Funcs | % Lines                                                                                                   
+--------------|---------|----------|---------|---------
+All files     |   78.58 |    80.86 |   77.58 |   78.58 |                                                                                                                         
+ color        |   72.02 |    72.36 |   69.04 |   72.02 |                                                                                                                         
+  color.ts    |   72.02 |    72.36 |   69.04 |   72.02
+ contrast     |      89 |    93.02 |     100 |      89 |                                                                                                                         
+  contrast.ts |      89 |    93.02 |     100 |   89                                                                                                 
+ data         |   83.87 |    81.98 |     100 |   83.87 |                                                                                                                         
+  data.ts     |   83.87 |    81.98 |     100 |   83.87   
 
 To run coverage tests:
 
