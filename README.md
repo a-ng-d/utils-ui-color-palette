@@ -172,13 +172,13 @@ Current test coverage results:
 
 File          | % Stmts | % Branch | % Funcs | % Lines
 --------------|---------|----------|---------|--------
-All files     |   78.58 |    80.86 |   77.58 |   78.58
+All files     |   79.82 |    81.81 |   81.42 |   79.82
  color        |   72.02 |    72.36 |   69.04 |   72.02
   color.ts    |   72.02 |    72.36 |   69.04 |   72.02
  contrast     |      89 |    93.02 |     100 |      89
   contrast.ts |      89 |    93.02 |     100 |      89
- data         |   85.68 |    83.47 |     100 |   85.68
-  data.ts     |   85.68 |    83.47 |     100 |   85.68
+ data         |   85.99 |    83.73 |     100 |   85.99
+  data.ts     |   85.99 |    83.73 |     100 |   85.99
 
 To run coverage tests:
 
