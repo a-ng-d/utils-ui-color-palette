@@ -22,6 +22,7 @@ const makeStyleDictionaryTokens = (paletteData: PaletteData) => {
     source: PaletteDataShadeItem
   ) => {
     return {
+      type: 'color',
       value: shade.isTransparent
         ? chroma(source.hex)
             .alpha(shade.alpha ?? 1)
