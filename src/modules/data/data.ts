@@ -21,8 +21,10 @@ import makeUIKit from '../../formats/makeUIKit'
 import makeTailwindConfig from '../../formats/makeTailwindConfig'
 import makeSwiftUI from '../../formats/makeSwiftUI'
 import makeStyleDictionaryTokens from '../../formats/makeStyleDictionaryTokens'
+import makeScssVariables from '../../formats/makeScssVariables'
 import makeResources from '../../formats/makeResources'
 import makeNativeTokens from '../../formats/makeNativeTokens'
+import makeLessVariables from '../../formats/makeLessVariables'
 import makeDtcgTokens from '../../formats/makeDtcgTokens'
 import makeCssCustomProps from '../../formats/makeCssCustomProps'
 import makeCompose from '../../formats/makeCompose'
@@ -463,10 +465,22 @@ export default class Data {
     return makeUniversalTokens(paletteData)
   }
 
-  makeCSS = (colorSpace: ColorSpaceConfiguration = 'RGB') => {
+  makeCssCustomProps = (colorSpace: ColorSpaceConfiguration = 'RGB') => {
     const paletteData = this.makePaletteData()
 
     return makeCssCustomProps(paletteData, colorSpace)
+  }
+
+  makeScssVariable = (colorSpace: ColorSpaceConfiguration = 'RGB') => {
+    const paletteData = this.makePaletteData()
+
+    return makeScssVariables(paletteData, colorSpace)
+  }
+
+  makeLessVariables = (colorSpace: ColorSpaceConfiguration = 'RGB') => {
+    const paletteData = this.makePaletteData()
+
+    return makeLessVariables(paletteData, colorSpace)
   }
 
   makeTailwindConfig = () => {

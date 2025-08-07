@@ -450,12 +450,12 @@ describe('Data', () => {
       meta: mockMeta,
     })
 
-    const resultRgb = data.makeCSS('RGB')
+    const resultRgb = data.makeCssCustomProps('RGB')
     expect(resultRgb).toBeDefined()
     expect(typeof resultRgb).toBe('string')
     expect(resultRgb).toContain(':root')
 
-    const resultLch = data.makeCSS('LCH')
+    const resultLch = data.makeCssCustomProps('LCH')
     expect(resultLch).toBeDefined()
     expect(resultLch).toContain('lch')
   })
@@ -524,5 +524,39 @@ describe('Data', () => {
     expect(result).toBeDefined()
     expect(typeof result).toBe('string')
     expect(result.length).toBeGreaterThan(0)
+  })
+
+  it('should generate SCSS variables with makeScssVariable', () => {
+    const data = new Data({
+      base: mockBase,
+      themes: [mockTheme],
+      meta: mockMeta,
+    })
+
+    const resultRgb = data.makeScssVariable('RGB')
+    expect(resultRgb).toBeDefined()
+    expect(typeof resultRgb).toBe('string')
+    expect(resultRgb).toContain('$')
+
+    const resultLch = data.makeScssVariable('LCH')
+    expect(resultLch).toBeDefined()
+    expect(resultLch).toContain('lch')
+  })
+
+  it('should generate Less variables with makeLessVariables', () => {
+    const data = new Data({
+      base: mockBase,
+      themes: [mockTheme],
+      meta: mockMeta,
+    })
+
+    const resultRgb = data.makeLessVariables('RGB')
+    expect(resultRgb).toBeDefined()
+    expect(typeof resultRgb).toBe('string')
+    expect(resultRgb).toContain('@')
+
+    const resultLch = data.makeLessVariables('LCH')
+    expect(resultLch).toBeDefined()
+    expect(resultLch).toContain('lch')
   })
 })
