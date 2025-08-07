@@ -66,7 +66,7 @@ export interface PaletteDataShadeItem {
   isClosestToRef?: boolean
   isSourceColorLocked?: boolean
   isTransparent?: boolean
-  type: 'source color' | 'color shade'
+  type: 'source color' | 'color shade/tint'
 }
 
 export interface ColourLovers {

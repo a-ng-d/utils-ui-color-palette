@@ -386,4 +386,143 @@ describe('Data', () => {
     expect(found).toBeDefined()
     expect(found?.styleId).toBe('style-123')
   })
+
+  it('should generate native tokens with makeNativeTokens', () => {
+    const data = new Data({
+      base: mockBase,
+      themes: [mockTheme],
+      meta: mockMeta,
+    })
+
+    const result = data.makeNativeTokens()
+    expect(result).toBeDefined()
+    expect(typeof result).toBe('string')
+    expect(result.length).toBeGreaterThan(0)
+  })
+
+  it('should generate DTCG tokens with makeDtcgTokens', () => {
+    const data = new Data({
+      base: mockBase,
+      themes: [mockTheme],
+      meta: mockMeta,
+    })
+
+    const resultRgb = data.makeDtcgTokens('RGB')
+    expect(resultRgb).toBeDefined()
+    expect(typeof resultRgb).toBe('string')
+    expect(resultRgb.length).toBeGreaterThan(0)
+
+    const resultHsl = data.makeDtcgTokens('HSL')
+    expect(resultHsl).toBeDefined()
+    expect(typeof resultHsl).toBe('string')
+  })
+
+  it('should generate Style Dictionary tokens with makeStyleDictionaryTokens', () => {
+    const data = new Data({
+      base: mockBase,
+      themes: [mockTheme],
+      meta: mockMeta,
+    })
+
+    const result = data.makeStyleDictionaryTokens()
+    expect(result).toBeDefined()
+    expect(typeof result).toBe('string')
+    expect(result.length).toBeGreaterThan(0)
+  })
+
+  it('should generate Universal JSON with makeUniversalJson', () => {
+    const data = new Data({
+      base: mockBase,
+      themes: [mockTheme],
+      meta: mockMeta,
+    })
+
+    const result = data.makeUniversalJson()
+    expect(result).toBeDefined()
+    expect(typeof result).toBe('string')
+    expect(result.length).toBeGreaterThan(0)
+  })
+
+  it('should generate CSS custom properties with makeCSS', () => {
+    const data = new Data({
+      base: mockBase,
+      themes: [mockTheme],
+      meta: mockMeta,
+    })
+
+    const resultRgb = data.makeCSS('RGB')
+    expect(resultRgb).toBeDefined()
+    expect(typeof resultRgb).toBe('string')
+    expect(resultRgb).toContain(':root')
+
+    const resultLch = data.makeCSS('LCH')
+    expect(resultLch).toBeDefined()
+    expect(resultLch).toContain('lch')
+  })
+
+  it('should generate Tailwind config with makeTailwindConfig', () => {
+    const data = new Data({
+      base: mockBase,
+      themes: [mockTheme],
+      meta: mockMeta,
+    })
+
+    const result = data.makeTailwindConfig()
+    expect(result).toBeDefined()
+    expect(result.theme).toBeDefined()
+    expect(result.theme.colors).toBeDefined()
+  })
+
+  it('should generate SwiftUI code with makeSwiftUI', () => {
+    const data = new Data({
+      base: mockBase,
+      themes: [mockTheme],
+      meta: mockMeta,
+    })
+
+    const result = data.makeSwiftUI()
+    expect(result).toBeDefined()
+    expect(typeof result).toBe('string')
+    expect(result).toContain('struct')
+    expect(result).toContain('Color')
+  })
+
+  it('should generate UIKit code with makeUIKit', () => {
+    const data = new Data({
+      base: mockBase,
+      themes: [mockTheme],
+      meta: mockMeta,
+    })
+
+    const result = data.makeUIKit()
+    expect(result).toBeDefined()
+    expect(typeof result).toBe('string')
+    expect(result).toContain('UIColor')
+  })
+
+  it('should generate Jetpack Compose code with makeCompose', () => {
+    const data = new Data({
+      base: mockBase,
+      themes: [mockTheme],
+      meta: mockMeta,
+    })
+
+    const result = data.makeCompose()
+    expect(result).toBeDefined()
+    expect(typeof result).toBe('string')
+    expect(result).toContain('Color')
+  })
+
+  it('should generate resource files with makeResources', () => {
+    const data = new Data({
+      base: mockBase,
+      themes: [mockTheme],
+      meta: mockMeta,
+    })
+
+    const result = data.makeResources()
+    expect(result).toBeDefined()
+    expect(typeof result).toBe('string')
+    expect(result.length).toBeGreaterThan(0)
+  })
 })

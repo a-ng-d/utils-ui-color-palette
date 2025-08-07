@@ -12,9 +12,20 @@ import {
   ScaleConfiguration,
   ThemeConfiguration,
   FullConfiguration,
+  ColorSpaceConfiguration,
 } from '@tps/configuration.types'
 import { Channel, HexModel } from '@tps/color.types'
 import Color from '@modules/color/color'
+import makeUniversalTokens from '../../formats/makeUniversalTokens'
+import makeUIKit from '../../formats/makeUIKit'
+import makeTailwindConfig from '../../formats/makeTailwindConfig'
+import makeSwiftUI from '../../formats/makeSwiftUI'
+import makeStyleDictionaryTokens from '../../formats/makeStyleDictionaryTokens'
+import makeResources from '../../formats/makeResources'
+import makeNativeTokens from '../../formats/makeNativeTokens'
+import makeDtcgTokens from '../../formats/makeDtcgTokens'
+import makeCssCustomProps from '../../formats/makeCssCustomProps'
+import makeCompose from '../../formats/makeCompose'
 
 export default class Data {
   private base: BaseConfiguration
@@ -280,7 +291,7 @@ export default class Data {
 
           paletteDataColorItem.shades.push({
             name: scaleName,
-            description: `Shade color with ${typeof scaledColor[0][1] === 'number' ? scaledColor[0][1].toFixed(1) : scaledColor[0][1]}% of ${
+            description: `Shade/Tint color with ${typeof scaledColor[0][1] === 'number' ? scaledColor[0][1].toFixed(1) : scaledColor[0][1]}% of ${
               color.alpha.isEnabled ? 'opacity' : 'lightness'
             }`,
             hex:
@@ -359,7 +370,7 @@ export default class Data {
               this.base.areSourceColorsLocked &&
               !color.alpha.isEnabled,
             isTransparent: color.alpha.isEnabled,
-            type: 'color shade',
+            type: 'color shade/tint',
           })
         })
 
@@ -426,6 +437,66 @@ export default class Data {
     )
 
     return libraryData
+  }
+
+  makeNativeTokens = () => {
+    const paletteData = this.makePaletteData()
+
+    return makeNativeTokens(paletteData)
+  }
+
+  makeDtcgTokens = (colorSpace: ColorSpaceConfiguration = 'RGB') => {
+    const paletteData = this.makePaletteData()
+
+    return makeDtcgTokens(paletteData, colorSpace)
+  }
+
+  makeStyleDictionaryTokens = () => {
+    const paletteData = this.makePaletteData()
+
+    return makeStyleDictionaryTokens(paletteData)
+  }
+
+  makeUniversalJson = () => {
+    const paletteData = this.makePaletteData()
+
+    return makeUniversalTokens(paletteData)
+  }
+
+  makeCSS = (colorSpace: ColorSpaceConfiguration = 'RGB') => {
+    const paletteData = this.makePaletteData()
+
+    return makeCssCustomProps(paletteData, colorSpace)
+  }
+
+  makeTailwindConfig = () => {
+    const paletteData = this.makePaletteData()
+
+    return makeTailwindConfig(paletteData)
+  }
+
+  makeSwiftUI = () => {
+    const paletteData = this.makePaletteData()
+
+    return makeSwiftUI(paletteData)
+  }
+
+  makeUIKit = () => {
+    const paletteData = this.makePaletteData()
+
+    return makeUIKit(paletteData)
+  }
+
+  makeCompose = () => {
+    const paletteData = this.makePaletteData()
+
+    return makeCompose(paletteData)
+  }
+
+  makeResources = () => {
+    const paletteData = this.makePaletteData()
+
+    return makeResources(paletteData)
   }
 
   makePaletteFullData = () => {
