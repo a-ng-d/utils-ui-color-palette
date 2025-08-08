@@ -123,7 +123,7 @@ export interface ExportConfiguration {
     | 'CSS'
     | 'SCSS'
     | 'LESS'
-    | 'JAVASCRIPT'
+    | 'JS'
     | 'SWIFT'
     | 'KT'
     | 'XML'
