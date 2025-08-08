@@ -5,7 +5,7 @@ interface colorCsv {
   csv: string
 }
 
-interface themeCsv {
+export interface modeCsv {
   name: string
   colors: Array<colorCsv>
   type: string
@@ -18,7 +18,7 @@ const makeCsv = (paletteData: PaletteData) => {
         ? paletteData.themes.filter((theme) => theme.type === 'default theme')
         : paletteData.themes.filter((theme) => theme.type === 'custom theme'),
     colorCsv: Array<colorCsv> = [],
-    themeCsv: Array<themeCsv> = [],
+    modeCsv: Array<modeCsv> = [],
     lightness: Array<string> = [],
     l: Array<number | string> = [],
     c: Array<number | string> = [],
@@ -43,7 +43,7 @@ const makeCsv = (paletteData: PaletteData) => {
       c.splice(0, c.length)
       h.splice(0, h.length)
     })
-    themeCsv.push({
+    modeCsv.push({
       name: theme.name,
       colors: colorCsv.map((c) => {
         return c
@@ -53,7 +53,7 @@ const makeCsv = (paletteData: PaletteData) => {
     colorCsv.splice(0, colorCsv.length)
   })
 
-  return themeCsv
+  return modeCsv
 }
 
 export default makeCsv

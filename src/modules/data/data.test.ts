@@ -559,4 +559,29 @@ describe('Data', () => {
     expect(resultLch).toBeDefined()
     expect(resultLch).toContain('lch')
   })
+
+  it('should generate CSV data with makeCsv', () => {
+    const data = new Data({
+      base: mockBase,
+      themes: [mockTheme],
+      meta: mockMeta,
+    })
+
+    const result = data.makeCsv()
+    expect(result).toBeDefined()
+    expect(Array.isArray(result)).toBe(true)
+    expect(result.length).toBeGreaterThan(0)
+
+    const firstMode = result[0]
+    expect(firstMode.name).toBe(mockTheme.name)
+    expect(firstMode.type).toBe(mockTheme.type)
+    expect(Array.isArray(firstMode.colors)).toBe(true)
+
+    if (firstMode.colors.length > 0) {
+      const firstColor = firstMode.colors[0]
+      expect(firstColor.name).toBeDefined()
+      expect(typeof firstColor.csv).toBe('string')
+      expect(firstColor.csv).toContain('Lightness,Chroma,Hue')
+    }
+  })
 })

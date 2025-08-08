@@ -26,6 +26,7 @@ import makeResources from '../../formats/makeResources'
 import makeNativeTokens from '../../formats/makeNativeTokens'
 import makeLessVariables from '../../formats/makeLessVariables'
 import makeDtcgTokens from '../../formats/makeDtcgTokens'
+import makeCsv from '../../formats/makeCsv'
 import makeCssCustomProps from '../../formats/makeCssCustomProps'
 import makeCompose from '../../formats/makeCompose'
 
@@ -511,6 +512,12 @@ export default class Data {
     const paletteData = this.makePaletteData()
 
     return makeResources(paletteData)
+  }
+
+  makeCsv = () => {
+    const paletteData = this.makePaletteData()
+
+    return makeCsv(paletteData)
   }
 
   makePaletteFullData = () => {
