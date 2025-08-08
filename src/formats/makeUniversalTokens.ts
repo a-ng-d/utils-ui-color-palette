@@ -10,6 +10,10 @@ const makeUniversalTokens = (paletteData: PaletteData) => {
     json: { [key: string]: any } = {}
 
   const model = (shade: PaletteDataShadeItem) => {
+    if (isNaN(shade.hsl[0])) shade.hsl[0] = 0
+    if (isNaN(shade.lch[2])) shade.lch[2] = 0
+    if (isNaN(shade.oklch[2])) shade.oklch[2] = 0
+
     return {
       rgb: {
         r: Math.floor(shade.rgb[0]),

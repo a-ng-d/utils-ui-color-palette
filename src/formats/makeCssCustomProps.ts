@@ -15,8 +15,8 @@ const makeCssCustomProps = (
     css: Array<string> = []
 
   const setValueAccordingToColorSpace = (shade: PaletteDataShadeItem) => {
-    if (shade.hsl[0] === null) shade.hsl[0] = 0
-    if (shade.lch[2] === null) shade.lch[2] = 0
+    if (isNaN(shade.hsl[0])) shade.hsl[0] = 0
+    if (isNaN(shade.lch[2])) shade.lch[2] = 0
 
     const actions: { [action: string]: () => void } = {
       RGB: () =>
@@ -28,10 +28,12 @@ const makeCssCustomProps = (
         `hsl(${Math.floor(shade.hsl[0])} ${Math.floor(
           shade.hsl[1] * 100
         )}% ${Math.floor(shade.hsl[2] * 100)}%)`,
-      LCH: () =>
-        `lch(${Math.floor(shade.lch[0])}% ${Math.floor(
+      LCH: () => {
+        if (shade.lch[2] === null) shade.lch[2] = 0
+        return `lch(${Math.floor(shade.lch[0])}% ${Math.floor(
           shade.lch[1]
-        )} ${Math.floor(shade.lch[2])})`,
+        )} ${Math.floor(shade.lch[2])})`
+      },
       P3: () =>
         `color(display-p3 ${shade.gl[0].toFixed(3)} ${shade.gl[1].toFixed(
           3
