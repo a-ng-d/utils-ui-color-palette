@@ -15,6 +15,9 @@ const makeScssVariables = (
     scss: Array<string> = []
 
   const setValueAccordingToColorSpace = (shade: PaletteDataShadeItem) => {
+    if (shade.hsl[0] === null) shade.hsl[0] = 0
+    if (shade.lch[2] === null) shade.lch[2] = 0
+
     const actions: { [action: string]: () => void } = {
       RGB: () =>
         `rgb(${Math.floor(shade.rgb[0])}, ${Math.floor(

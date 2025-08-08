@@ -14,6 +14,8 @@ const makeDtcgTokens = (
     json: { [key: string]: any } = {}
 
   const setValueAccordingToColorSpace = (shade: PaletteDataShadeItem) => {
+    if (shade.oklch[2] === null) shade.oklch[2] = 0
+
     const actions: { [action: string]: () => void } = {
       RGB: () => {
         return {
