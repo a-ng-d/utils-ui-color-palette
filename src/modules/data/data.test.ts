@@ -557,7 +557,6 @@ describe('Data', () => {
     })
 
     const defaultThemeResult = defaultThemeData.makeTailwindV4Config()
-    console.log(defaultThemeResult)
     expect(defaultThemeResult).toBeDefined()
     expect(typeof defaultThemeResult).toBe('string')
     expect(defaultThemeResult).toContain('@theme {')
@@ -580,7 +579,6 @@ describe('Data', () => {
     })
 
     const customThemeResult = customThemeData.makeTailwindV4Config()
-    console.log(customThemeResult)
     expect(customThemeResult).toBeDefined()
     expect(customThemeResult).toContain('@theme {')
     expect(customThemeResult).toContain('--color-')

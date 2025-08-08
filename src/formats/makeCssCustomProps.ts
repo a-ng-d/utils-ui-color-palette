@@ -92,7 +92,7 @@ const makeCssCustomProps = (
     })
     rowCss.pop()
     css.push(
-      `:root${
+      `/* ${theme.name} */\n:root${
         theme.type === 'custom theme'
           ? `[data-theme='${new Case(theme.name).doKebabCase()}']`
           : ''

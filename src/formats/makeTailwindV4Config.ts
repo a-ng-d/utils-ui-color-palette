@@ -9,12 +9,11 @@ const makeTailwindV4Config = (paletteData: PaletteData) => {
       ? paletteData.themes.filter((theme) => theme.type === 'default theme')
       : paletteData.themes.filter((theme) => theme.type === 'custom theme')
 
-  let cssOutput = '@import "tailwindcss";\n\n@theme {\n  --color-*: initial;\n'
+  let cssOutput =
+    '@import "tailwindcss";\n\n@theme {\n  --color-*: initial;\n\n'
 
   if (workingThemes[0].type !== 'custom theme') {
     workingThemes.forEach((theme) => {
-      cssOutput += `  /* ${theme.name} */\n`
-
       theme.colors.forEach((color) => {
         const source = color.shades.find(
           (shade) => shade.type === 'source color'
@@ -45,7 +44,7 @@ const makeTailwindV4Config = (paletteData: PaletteData) => {
     workingThemes.forEach((theme) => {
       const themeName = new Case(theme.name).doKebabCase()
 
-      cssOutput += `  /* ${theme.name} */\n`
+      //cssOutput += `  /* ${theme.name} */\n`
 
       theme.colors.forEach((color) => {
         const source = color.shades.find(
@@ -53,7 +52,7 @@ const makeTailwindV4Config = (paletteData: PaletteData) => {
         )
 
         const colorName = new Case(color.name).doKebabCase()
-        cssOutput += `  /* ${color.name} */\n`
+        cssOutput += `  /* ${theme.name} - ${color.name} */\n`
 
         color.shades.forEach((shade) => {
           const colorValue = shade.isTransparent

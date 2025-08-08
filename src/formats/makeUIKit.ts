@@ -39,7 +39,7 @@ const makeUIKit = (paletteData: PaletteData) => {
     UIColors.pop()
     if (workingThemes[0].type === 'custom theme')
       swift.push(
-        `struct ${new Case(theme.name).doPascalCase()} {\n    ${UIColors.join(
+        `// ${theme.name}\n  struct ${new Case(theme.name).doPascalCase()} {\n    ${UIColors.join(
           '\n    '
         )}\n  }`
       )
