@@ -472,7 +472,7 @@ export default class Data {
     return makeCssCustomProps(paletteData, colorSpace)
   }
 
-  makeScssVariable = (colorSpace: ColorSpaceConfiguration = 'RGB') => {
+  makeScssVariables = (colorSpace: ColorSpaceConfiguration = 'RGB') => {
     const paletteData = this.makePaletteData()
 
     return makeScssVariables(paletteData, colorSpace)

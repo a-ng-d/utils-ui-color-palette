@@ -533,12 +533,12 @@ describe('Data', () => {
       meta: mockMeta,
     })
 
-    const resultRgb = data.makeScssVariable('RGB')
+    const resultRgb = data.makeScssVariables('RGB')
     expect(resultRgb).toBeDefined()
     expect(typeof resultRgb).toBe('string')
     expect(resultRgb).toContain('$')
 
-    const resultLch = data.makeScssVariable('LCH')
+    const resultLch = data.makeScssVariables('LCH')
     expect(resultLch).toBeDefined()
     expect(resultLch).toContain('lch')
   })
