@@ -18,9 +18,10 @@ import { Channel, HexModel } from '@tps/color.types'
 import Color from '@modules/color/color'
 import makeUniversalTokens from '../../formats/makeUniversalTokens'
 import makeUIKit from '../../formats/makeUIKit'
-import makeTailwindConfigV3 from '../../formats/makeTailwindConfigV3'
+import makeTailwindV4Config from '../../formats/makeTailwindV4Config'
+import makeTailwindV3Config from '../../formats/makeTailwindV3Config'
 import makeSwiftUI from '../../formats/makeSwiftUI'
-import makeStyleDictionaryTokens from '../../formats/makeStyleDictionaryTokens'
+import makeStyleDictionaryV3Tokens from '../../formats/makeStyleDictionaryV3Tokens'
 import makeScssVariables from '../../formats/makeScssVariables'
 import makeResources from '../../formats/makeResources'
 import makeNativeTokens from '../../formats/makeNativeTokens'
@@ -29,7 +30,6 @@ import makeDtcgTokens from '../../formats/makeDtcgTokens'
 import makeCsv from '../../formats/makeCsv'
 import makeCssCustomProps from '../../formats/makeCssCustomProps'
 import makeCompose from '../../formats/makeCompose'
-import makeTailwindConfigV4 from '../../formats/makeTailwindConfigV4'
 
 export default class Data {
   private base: BaseConfiguration
@@ -455,10 +455,10 @@ export default class Data {
     return makeDtcgTokens(paletteData, colorSpace)
   }
 
-  makeStyleDictionaryTokens = () => {
+  makeStyleDictionaryV3Tokens = () => {
     const paletteData = this.makePaletteData()
 
-    return makeStyleDictionaryTokens(paletteData)
+    return makeStyleDictionaryV3Tokens(paletteData)
   }
 
   makeUniversalJson = () => {
@@ -485,16 +485,16 @@ export default class Data {
     return makeLessVariables(paletteData, colorSpace)
   }
 
-  makeTailwindConfigV3 = () => {
+  makeTailwindV3Config = () => {
     const paletteData = this.makePaletteData()
 
-    return makeTailwindConfigV3(paletteData)
+    return makeTailwindV3Config(paletteData)
   }
 
-  makeTailwindConfigV4 = () => {
+  makeTailwindV4Config = () => {
     const paletteData = this.makePaletteData()
 
-    return makeTailwindConfigV4(paletteData)
+    return makeTailwindV4Config(paletteData)
   }
 
   makeSwiftUI = () => {

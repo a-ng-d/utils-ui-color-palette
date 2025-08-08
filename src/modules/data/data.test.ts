@@ -502,7 +502,7 @@ describe('Data', () => {
       meta: mockMeta,
     })
 
-    const result = data.makeStyleDictionaryTokens()
+    const result = data.makeStyleDictionaryV3Tokens()
     expect(result).toBeDefined()
     expect(typeof result).toBe('string')
     expect(result.length).toBeGreaterThan(0)
@@ -545,7 +545,7 @@ describe('Data', () => {
       meta: mockMeta,
     })
 
-    const result = data.makeTailwindConfigV3()
+    const result = data.makeTailwindV3Config()
     expect(result).toBeDefined()
     expect(result.theme).toBeDefined()
     expect(result.theme.colors).toBeDefined()
@@ -558,7 +558,7 @@ describe('Data', () => {
       meta: mockMeta,
     })
 
-    const defaultThemeResult = defaultThemeData.makeTailwindConfigV4()
+    const defaultThemeResult = defaultThemeData.makeTailwindV4Config()
     console.log(defaultThemeResult)
     expect(defaultThemeResult).toBeDefined()
     expect(typeof defaultThemeResult).toBe('string')
@@ -581,7 +581,7 @@ describe('Data', () => {
       meta: mockMeta,
     })
 
-    const customThemeResult = customThemeData.makeTailwindConfigV4()
+    const customThemeResult = customThemeData.makeTailwindV4Config()
     console.log(customThemeResult)
     expect(customThemeResult).toBeDefined()
     expect(customThemeResult).toContain('@theme {')

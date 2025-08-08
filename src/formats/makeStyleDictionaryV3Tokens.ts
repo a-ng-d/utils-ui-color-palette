@@ -5,7 +5,7 @@ import {
   PaletteDataShadeItem,
 } from '@tps/data.types'
 
-const makeStyleDictionaryTokens = (paletteData: PaletteData) => {
+const makeStyleDictionaryV3Tokens = (paletteData: PaletteData) => {
   const workingThemes =
       paletteData.themes.filter((theme) => theme.type === 'custom theme')
         .length === 0
@@ -75,4 +75,4 @@ const makeStyleDictionaryTokens = (paletteData: PaletteData) => {
   return JSON.stringify(json, null, '  ')
 }
 
-export default makeStyleDictionaryTokens
+export default makeStyleDictionaryV3Tokens

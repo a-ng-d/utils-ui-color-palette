@@ -2,14 +2,14 @@ import chroma from 'chroma-js'
 import { PaletteData } from '@tps/data.types'
 import { Case } from '@a_ng_d/figmug-utils'
 
-const makeTailwindConfigV4 = (paletteData: PaletteData) => {
+const makeTailwindV4Config = (paletteData: PaletteData) => {
   const workingThemes =
     paletteData.themes.filter((theme) => theme.type === 'custom theme')
       .length === 0
       ? paletteData.themes.filter((theme) => theme.type === 'default theme')
       : paletteData.themes.filter((theme) => theme.type === 'custom theme')
 
-  let cssOutput = '@import "tailwindcss";\n\n@theme {\n'
+  let cssOutput = '@import "tailwindcss";\n\n@theme {\n  --color-*: initial;\n'
 
   if (workingThemes[0].type !== 'custom theme') {
     workingThemes.forEach((theme) => {
@@ -80,4 +80,4 @@ const makeTailwindConfigV4 = (paletteData: PaletteData) => {
   return cssOutput
 }
 
-export default makeTailwindConfigV4
+export default makeTailwindV4Config
