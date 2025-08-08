@@ -77,49 +77,28 @@ const makeScssVariables = (
     (theme) => theme.type === 'default theme'
   )
 
-  const colorVariables = new Set<string>()
-
-  workingThemes.forEach((theme) => {
-    theme.colors.forEach((color) => {
-      color.shades.forEach((shade) => {
-        const source = color.shades.find((c) => c.type === 'source color')
-        if (source) {
-          const colorName = new Case(color.name).doKebabCase()
-          const cssVarName = `--${colorName}-${shade.name}`
-          colorVariables.add(cssVarName)
-        }
-      })
-    })
-  })
-
-  if (colorVariables.size > 0) {
-    colorVariables.forEach((cssVarName) => {
-      const scssVarName = `$${cssVarName.substring(2)}`
-      globalVars.push(`${scssVarName}: var(${cssVarName});`)
-    })
-
-    scss.push(globalVars.join('\n'))
-  }
-
   if (defaultTheme) {
-    const rootVars: Array<string> = [':root {']
+    const defaultVars: Array<string> = []
 
-    defaultTheme.colors.forEach((color) => {
-      color.shades.forEach((shade) => {
+    defaultTheme.colors.forEach((color, index) => {
+      if (index > 0) {
+        defaultVars.push('')
+      }
+
+      defaultVars.push(`// ${color.name}`)
+      color.shades.reverse().forEach((shade) => {
         const source = color.shades.find((c) => c.type === 'source color')
-        const colorName = new Case(color.name).doKebabCase()
-        const cssVarName = `--${colorName}-${shade.name}`
+        const variableName = `$${new Case(color.name).doKebabCase()}-${shade.name}`
 
         if (source) {
-          rootVars.push(
-            `  ${cssVarName}: ${shade.isTransparent ? setValueAccordingToAlpha(shade, source) : setValueAccordingToColorSpace(shade)};`
+          defaultVars.push(
+            `${variableName}: ${shade.isTransparent ? setValueAccordingToAlpha(shade, source) : setValueAccordingToColorSpace(shade)};`
           )
         }
       })
     })
 
-    rootVars.push('}')
-    scss.push(rootVars.join('\n'))
+    scss.push(defaultVars.join('\n'))
 
     return scss.join('\n')
   }
@@ -153,6 +132,51 @@ const makeScssVariables = (
     themeVars.push('}')
     scss.push(themeVars.join('\n'))
   })
+
+  const colorVariables = new Set<string>()
+
+  workingThemes.forEach((theme) => {
+    theme.colors.forEach((color) => {
+      color.shades.forEach((shade) => {
+        const source = color.shades.find((c) => c.type === 'source color')
+        if (source) {
+          const colorName = new Case(color.name).doKebabCase()
+          const cssVarName = `--${colorName}-${shade.name}`
+          colorVariables.add(cssVarName)
+        }
+      })
+    })
+  })
+
+  if (colorVariables.size > 0) {
+    const colorGroups = new Map<string, Array<string>>()
+
+    colorVariables.forEach((cssVarName) => {
+      const match = cssVarName.match(/--([a-zA-Z0-9-]+)-([a-zA-Z0-9-]+)/)
+      if (match) {
+        const colorName = match[1]
+        if (!colorGroups.has(colorName)) {
+          colorGroups.set(colorName, [])
+        }
+        const scssVarName = `$${cssVarName.substring(2)}`
+        colorGroups.get(colorName)!.push(`${scssVarName}: var(${cssVarName});`)
+      }
+    })
+
+    colorGroups.forEach((vars, colorName) => {
+      globalVars.push(
+        `// ${colorName.charAt(0).toUpperCase() + colorName.slice(1)}`
+      )
+      globalVars.push(...vars)
+      globalVars.push('')
+    })
+
+    if (globalVars.length > 0 && globalVars[globalVars.length - 1] === '') {
+      globalVars.pop()
+    }
+
+    scss.push(globalVars.join('\n'))
+  }
 
   const rootBlock: string[] = [`:root {`]
 
