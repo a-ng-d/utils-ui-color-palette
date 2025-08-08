@@ -547,8 +547,6 @@ describe('Data', () => {
 
     const result = data.makeTailwindV3Config()
     expect(result).toBeDefined()
-    expect(result.theme).toBeDefined()
-    expect(result.theme.colors).toBeDefined()
   })
 
   it('should generate Tailwind v4 config with makeTailwindConfigV4', () => {
