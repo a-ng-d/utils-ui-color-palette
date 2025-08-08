@@ -48,6 +48,8 @@ const makeDtcgTokens = (
     source: PaletteDataShadeItem,
     shade: PaletteDataShadeItem
   ) => {
+    if (isNaN(shade.oklch[2])) shade.oklch[2] = 0
+    
     const actions: { [action: string]: () => void } = {
       RGB: () => {
         return {

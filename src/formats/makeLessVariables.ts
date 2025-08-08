@@ -17,6 +17,7 @@ const makeLessVariables = (
   const setValueAccordingToColorSpace = (shade: PaletteDataShadeItem) => {
     if (isNaN(shade.hsl[0])) shade.hsl[0] = 0
     if (isNaN(shade.lch[2])) shade.lch[2] = 0
+    if (isNaN(shade.oklch[2])) shade.oklch[2] = 0
 
     const actions: { [action: string]: () => void } = {
       RGB: () =>
@@ -25,17 +26,15 @@ const makeLessVariables = (
         )}, ${Math.floor(shade.rgb[2])})`,
       HEX: () => shade.hex,
       HSL: () =>
-        `hsl(${Math.floor(shade.hsl[0])}, ${Math.floor(
+        `hsl(${Math.floor(shade.hsl[0])} ${Math.floor(
           shade.hsl[1] * 100
-        )}%, ${Math.floor(shade.hsl[2] * 100)}%)`,
+        )}% ${Math.floor(shade.hsl[2] * 100)}%)`,
       LCH: () =>
-        `lch(${Math.floor(shade.lch[0])}%, ${Math.floor(
+        `lch(${Math.floor(shade.lch[0])}% ${Math.floor(
           shade.lch[1]
-        )}, ${Math.floor(shade.lch[2])})`,
-      P3: () =>
-        `color(display-p3 ${shade.gl[0].toFixed(3)}, ${shade.gl[1].toFixed(
-          3
-        )}, ${shade.gl[2].toFixed(3)})`,
+        )} ${Math.floor(shade.lch[2])})`,
+      OKLCH: () =>
+        `oklch(${Math.floor(shade.oklch[0] * 100)}% ${shade.oklch[1].toFixed(3)} ${Math.floor(shade.oklch[2])})`,
     }
 
     return actions[colorSpace ?? 'RGB']?.()
@@ -45,6 +44,10 @@ const makeLessVariables = (
     shade: PaletteDataShadeItem,
     source: PaletteDataShadeItem
   ) => {
+    if (isNaN(shade.hsl[0])) shade.hsl[0] = 0
+    if (isNaN(shade.lch[2])) shade.lch[2] = 0
+    if (isNaN(shade.oklch[2])) shade.oklch[2] = 0
+
     const actions: { [action: string]: () => void } = {
       RGB: () =>
         `rgba(${Math.floor(source.rgb[0])}, ${Math.floor(
@@ -57,15 +60,13 @@ const makeLessVariables = (
       HSL: () =>
         `hsla(${Math.floor(source.hsl[0])}, ${Math.floor(
           source.hsl[1] * 100
-        )}%, ${Math.floor(source.hsl[2] * 100)}%, ${shade.alpha?.toFixed(2) ?? 1})`,
+        )}% ${Math.floor(source.hsl[2] * 100)}% ${shade.alpha?.toFixed(2) ?? 1})`,
       LCH: () =>
         `lch(${Math.floor(source.lch[0])}% ${Math.floor(
           source.lch[1]
         )} ${Math.floor(source.lch[2])} / ${shade.alpha?.toFixed(2) ?? 1})`,
-      P3: () =>
-        `color(display-p3 ${source.gl[0].toFixed(3)}, ${source.gl[1].toFixed(
-          3
-        )}, ${source.gl[2].toFixed(3)}, ${shade.alpha?.toFixed(2) ?? 1})`,
+      OKLCH: () =>
+        `oklch(${Math.floor(source.oklch[0] * 100)}% ${source.oklch[1].toFixed(3)} ${Math.floor(source.oklch[2])} / ${shade.alpha?.toFixed(2) ?? 1})`,
     }
 
     return actions[colorSpace ?? 'RGB']?.()
@@ -78,7 +79,11 @@ const makeLessVariables = (
   if (defaultTheme) {
     const defaultVars: Array<string> = []
 
-    defaultTheme.colors.forEach((color) => {
+    defaultTheme.colors.forEach((color, index) => {
+      if (index > 0) {
+        defaultVars.push('')
+      }
+
       defaultVars.push(`// ${color.name}`)
       color.shades.reverse().forEach((shade) => {
         const source = color.shades.find((c) => c.type === 'source color')
@@ -90,83 +95,65 @@ const makeLessVariables = (
           )
         }
       })
-      defaultVars.push('')
     })
 
     less.push(defaultVars.join('\n'))
+
+    return less.join('\n')
   }
 
-  workingThemes
-    .filter((theme) => theme.type === 'custom theme')
-    .forEach((theme) => {
-      const themeName = new Case(theme.name).doKebabCase()
-      less.push(`
-// ${theme.name} mode
-#${themeName} {
-  .mode() {`)
+  workingThemes.forEach((theme) => {
+    const themeName = new Case(theme.name).doKebabCase()
+    const themeVars: Array<string> = []
 
-      const themeVars: Array<string> = []
+    themeVars.push(`// ${theme.name}`)
+    themeVars.push(`.${themeName}() {`)
 
-      theme.colors.forEach((color) => {
-        themeVars.push(`    // ${color.name}`)
-        color.shades.reverse().forEach((shade) => {
-          const source = color.shades.find((c) => c.type === 'source color')
-          const variableName = `@${new Case(color.name).doKebabCase()}-${shade.name}`
-
-          if (source) {
-            themeVars.push(
-              `    ${variableName}: ${shade.isTransparent ? setValueAccordingToAlpha(shade, source) : setValueAccordingToColorSpace(shade)};`
-            )
-          }
-        })
+    theme.colors.forEach((color, index) => {
+      if (index > 0) {
         themeVars.push('')
-      })
-
-      if (themeVars.length > 0) {
-        themeVars.pop()
       }
 
-      less.push(themeVars.join('\n'))
-      less.push(`  }
-}`)
+      themeVars.push(`  // ${color.name}`)
+      color.shades.reverse().forEach((shade) => {
+        const source = color.shades.find((c) => c.type === 'source color')
+        const variableName = `@${new Case(color.name).doKebabCase()}-${shade.name}`
+
+        if (source) {
+          themeVars.push(
+            `  ${variableName}: ${shade.isTransparent ? setValueAccordingToAlpha(shade, source) : setValueAccordingToColorSpace(shade)};`
+          )
+        }
+      })
     })
 
-  less.push(`
-// Mode application
-.apply-mode(@mode) {
-  & when (@mode = default) {
-    // Default mode variables are already available
+    themeVars.push('}')
+    less.push(themeVars.join('\n'))
+  })
+
+  const rootBlock: string[] = [`:root {`]
+
+  workingThemes.forEach((theme, index) => {
+    const themeName = new Case(theme.name).doKebabCase()
+    rootBlock.push(`  &[data-theme="${themeName}"] {
+    .${themeName}();
   }`)
+    if (index !== workingThemes.length - 1) rootBlock.push('')
+  })
 
-  workingThemes
-    .filter((theme) => theme.type === 'custom theme')
-    .forEach((theme) => {
-      const themeName = new Case(theme.name).doKebabCase()
-      less.push(`
-  & when (@mode = ${themeName}) {
-    #${themeName} > .mode();
-  }`)
-    })
+  rootBlock.push(`}`)
+  less.push(rootBlock.join('\n'))
 
-  less.push(`}
+  const classBlocks: string[] = []
 
-// Mode application via HTML attribute
-.with-mode(@selector) {
-  @{selector} {
-    @mode-content();
-  }
-  
-  ${workingThemes
-    .filter((theme) => theme.type === 'custom theme')
-    .map((theme) => {
-      const themeName = new Case(theme.name).doKebabCase()
-      return `@{selector}[data-mode="${themeName}"] {
-    #${themeName} > .mode();
-    @mode-content();
-  }`
-    })
-    .join('\n\n  ')}
+  workingThemes.forEach((theme) => {
+    const themeName = new Case(theme.name).doKebabCase()
+    classBlocks.push(`.${themeName} {
+  .${themeName}();
 }`)
+  })
+
+  less.push(classBlocks.join('\n\n'))
 
   return less.join('\n\n')
 }

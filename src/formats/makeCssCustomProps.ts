@@ -28,12 +28,12 @@ const makeCssCustomProps = (
         `hsl(${Math.floor(shade.hsl[0])} ${Math.floor(
           shade.hsl[1] * 100
         )}% ${Math.floor(shade.hsl[2] * 100)}%)`,
-      LCH: () => {
-        if (shade.lch[2] === null) shade.lch[2] = 0
-        return `lch(${Math.floor(shade.lch[0])}% ${Math.floor(
+      LCH: () =>
+        `lch(${Math.floor(shade.lch[0])}% ${Math.floor(
           shade.lch[1]
-        )} ${Math.floor(shade.lch[2])})`
-      },
+        )} ${Math.floor(shade.lch[2])})`,
+      OKLCH: () =>
+        `oklch(${Math.floor(shade.oklch[0] * 100)}% ${shade.oklch[1].toFixed(3)} ${Math.floor(shade.oklch[2])})`,
       P3: () =>
         `color(display-p3 ${shade.gl[0].toFixed(3)} ${shade.gl[1].toFixed(
           3
@@ -64,6 +64,8 @@ const makeCssCustomProps = (
         `lch(${Math.floor(source.lch[0])}% ${Math.floor(
           source.lch[1]
         )} ${Math.floor(source.lch[2])} / ${shade.alpha?.toFixed(2) ?? 1})`,
+      OKLCH: () =>
+        `oklch(${Math.floor(source.oklch[0 * 100])}% ${source.oklch[1].toFixed(3)} ${Math.floor(source.oklch[2])} / ${shade.alpha?.toFixed(2) ?? 1})`,
       P3: () =>
         `color(display-p3 ${source.gl[0].toFixed(3)} ${source.gl[1].toFixed(
           3
