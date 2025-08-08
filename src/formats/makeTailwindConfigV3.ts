@@ -2,7 +2,7 @@ import chroma from 'chroma-js'
 import { PaletteData } from '@tps/data.types'
 import { Case } from '@a_ng_d/figmug-utils'
 
-const makeTailwindConfig = (paletteData: PaletteData) => {
+const makeTailwindConfigV3 = (paletteData: PaletteData) => {
   const workingThemes =
       paletteData.themes.filter((theme) => theme.type === 'custom theme')
         .length === 0
@@ -63,4 +63,4 @@ const makeTailwindConfig = (paletteData: PaletteData) => {
   return json
 }
 
-export default makeTailwindConfig
+export default makeTailwindConfigV3

@@ -18,7 +18,7 @@ import { Channel, HexModel } from '@tps/color.types'
 import Color from '@modules/color/color'
 import makeUniversalTokens from '../../formats/makeUniversalTokens'
 import makeUIKit from '../../formats/makeUIKit'
-import makeTailwindConfig from '../../formats/makeTailwindConfig'
+import makeTailwindConfigV3 from '../../formats/makeTailwindConfigV3'
 import makeSwiftUI from '../../formats/makeSwiftUI'
 import makeStyleDictionaryTokens from '../../formats/makeStyleDictionaryTokens'
 import makeScssVariables from '../../formats/makeScssVariables'
@@ -29,6 +29,7 @@ import makeDtcgTokens from '../../formats/makeDtcgTokens'
 import makeCsv from '../../formats/makeCsv'
 import makeCssCustomProps from '../../formats/makeCssCustomProps'
 import makeCompose from '../../formats/makeCompose'
+import makeTailwindConfigV4 from '../../formats/makeTailwindConfigV4'
 
 export default class Data {
   private base: BaseConfiguration
@@ -484,10 +485,16 @@ export default class Data {
     return makeLessVariables(paletteData, colorSpace)
   }
 
-  makeTailwindConfig = () => {
+  makeTailwindConfigV3 = () => {
     const paletteData = this.makePaletteData()
 
-    return makeTailwindConfig(paletteData)
+    return makeTailwindConfigV3(paletteData)
+  }
+
+  makeTailwindConfigV4 = () => {
+    const paletteData = this.makePaletteData()
+
+    return makeTailwindConfigV4(paletteData)
   }
 
   makeSwiftUI = () => {

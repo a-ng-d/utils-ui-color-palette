@@ -6,6 +6,7 @@ import {
   EasingConfiguration,
   ColorSpaceConfiguration,
 } from '@tps/configuration.types'
+import { Case } from '@a_ng_d/figmug-utils'
 import Data from './data'
 
 describe('Data', () => {
@@ -26,11 +27,35 @@ describe('Data', () => {
     colors: [
       {
         id: 'color1',
-        name: 'Test Color',
+        name: 'Test Color A',
         description: 'A test color',
         rgb: { r: 1, g: 0, b: 0 },
         alpha: {
           isEnabled: false,
+          backgroundColor: '#FFFFFF',
+        },
+        hue: { shift: 0, isLocked: false },
+        chroma: { shift: 100, isLocked: false },
+      },
+      {
+        id: 'color2',
+        name: 'Test Color B',
+        description: 'A test color',
+        rgb: { r: 0, g: 1, b: 0 },
+        alpha: {
+          isEnabled: false,
+          backgroundColor: '#FFFFFF',
+        },
+        hue: { shift: 0, isLocked: false },
+        chroma: { shift: 100, isLocked: false },
+      },
+      {
+        id: 'color3',
+        name: 'Test Color C',
+        description: 'A test color',
+        rgb: { r: 0, g: 0, b: 1 },
+        alpha: {
+          isEnabled: true,
           backgroundColor: '#FFFFFF',
         },
         hue: { shift: 0, isLocked: false },
@@ -59,6 +84,60 @@ describe('Data', () => {
     paletteBackground: '#FFFFFF',
     isEnabled: true,
   }
+
+  const mockThemes: Array<ThemeConfiguration> = [
+    {
+      id: '00000000000',
+      name: 'Default Theme',
+      description: 'A test theme',
+      type: 'default theme',
+      scale: {
+        '100': 100,
+        '50': 50,
+      },
+      visionSimulationMode: 'NONE',
+      textColorsTheme: {
+        lightColor: '#FFFFFF',
+        darkColor: '#000000',
+      },
+      paletteBackground: '#FFFFFF',
+      isEnabled: true,
+    },
+    {
+      id: '00000000001',
+      name: 'Custom Theme A',
+      description: 'A custom theme',
+      type: 'custom theme',
+      scale: {
+        '100': 75,
+        '50': 25,
+      },
+      visionSimulationMode: 'NONE',
+      textColorsTheme: {
+        lightColor: '#FFFFFF',
+        darkColor: '#000000',
+      },
+      paletteBackground: '#FFFFFF',
+      isEnabled: true,
+    },
+    {
+      id: '00000000002',
+      name: 'Custom Theme B',
+      description: 'A custom theme',
+      type: 'custom theme',
+      scale: {
+        '100': 50,
+        '50': 0,
+      },
+      visionSimulationMode: 'NONE',
+      textColorsTheme: {
+        lightColor: '#FFFFFF',
+        darkColor: '#000000',
+      },
+      paletteBackground: '#FFFFFF',
+      isEnabled: true,
+    },
+  ]
 
   const mockMeta: MetaConfiguration = {
     id: 'palette1',
@@ -116,7 +195,6 @@ describe('Data', () => {
     expect(result.type).toBe('UI_COLOR_PALETTE')
   })
 
-  // Test with alpha enabled color
   it('should handle alpha enabled colors correctly', () => {
     const baseWithAlpha: BaseConfiguration = {
       ...mockBase,
@@ -460,17 +538,71 @@ describe('Data', () => {
     expect(resultLch).toContain('lch')
   })
 
-  it('should generate Tailwind config with makeTailwindConfig', () => {
+  it('should generate Tailwind v3 config with makeTailwindConfigV3', () => {
     const data = new Data({
       base: mockBase,
       themes: [mockTheme],
       meta: mockMeta,
     })
 
-    const result = data.makeTailwindConfig()
+    const result = data.makeTailwindConfigV3()
     expect(result).toBeDefined()
     expect(result.theme).toBeDefined()
     expect(result.theme.colors).toBeDefined()
+  })
+
+  it('should generate Tailwind v4 config with makeTailwindConfigV4', () => {
+    const defaultThemeData = new Data({
+      base: mockBase,
+      themes: [mockTheme],
+      meta: mockMeta,
+    })
+
+    const defaultThemeResult = defaultThemeData.makeTailwindConfigV4()
+    console.log(defaultThemeResult)
+    expect(defaultThemeResult).toBeDefined()
+    expect(typeof defaultThemeResult).toBe('string')
+    expect(defaultThemeResult).toContain('@theme {')
+    expect(defaultThemeResult).toContain('--color-')
+    expect(defaultThemeResult).toContain('@import "tailwindcss"')
+
+    const paletteData = defaultThemeData.makePaletteData()
+    const defaultThemeColors = paletteData.themes[0].colors.map((color) =>
+      new Case(color.name).doKebabCase()
+    )
+
+    if (defaultThemeColors.length > 0) {
+      expect(defaultThemeResult).toContain(`--color-${defaultThemeColors[0]}-`)
+    }
+
+    const customThemeData = new Data({
+      base: mockBase,
+      themes: mockThemes,
+      meta: mockMeta,
+    })
+
+    const customThemeResult = customThemeData.makeTailwindConfigV4()
+    console.log(customThemeResult)
+    expect(customThemeResult).toBeDefined()
+    expect(customThemeResult).toContain('@theme {')
+    expect(customThemeResult).toContain('--color-')
+
+    const customThemesExist = mockThemes.some(
+      (theme) => theme.type === 'custom theme'
+    )
+
+    if (customThemesExist) {
+      const customTheme = mockThemes.find(
+        (theme) => theme.type === 'custom theme'
+      )
+      if (customTheme && defaultThemeColors.length > 0) {
+        const customThemeName = new Case(customTheme.name).doKebabCase()
+        const colorName = defaultThemeColors[0]
+        expect(customThemeResult).toContain(
+          `--color-${customThemeName}-${colorName}-`
+        )
+      }
+    }
   })
 
   it('should generate SwiftUI code with makeSwiftUI', () => {
@@ -529,7 +661,7 @@ describe('Data', () => {
   it('should generate SCSS variables with makeScssVariable', () => {
     const data = new Data({
       base: mockBase,
-      themes: [mockTheme],
+      themes: mockThemes,
       meta: mockMeta,
     })
 
@@ -546,7 +678,7 @@ describe('Data', () => {
   it('should generate Less variables with makeLessVariables', () => {
     const data = new Data({
       base: mockBase,
-      themes: [mockTheme],
+      themes: mockThemes,
       meta: mockMeta,
     })
 
