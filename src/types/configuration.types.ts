@@ -118,14 +118,25 @@ export interface ThemeConfiguration {
 }
 
 export interface ExportConfiguration {
-  format: 'JSON' | 'CSS' | 'TAILWIND' | 'SWIFT' | 'KT' | 'XML' | 'CSV'
-  context:
-    | 'TOKENS_DTCG'
-    | 'TOKENS_GLOBAL'
-    | 'TOKENS_AMZN_STYLE_DICTIONARY'
-    | 'TOKENS_TOKENS_STUDIO'
+  format:
+    | 'JSON'
     | 'CSS'
-    | 'TAILWIND'
+    | 'SCSS'
+    | 'LESS'
+    | 'JAVASCRIPT'
+    | 'SWIFT'
+    | 'KT'
+    | 'XML'
+    | 'CSV'
+  context:
+    | 'TOKENS_NATIVE'
+    | 'TOKENS_DTCG'
+    | 'TOKENS_STYLE_DICTIONARY_3'
+    | 'TOKENS_UNIVERSAL'
+    | 'CSS'
+    | 'SCSS'
+    | 'LESS'
+    | 'JAVASCRIPT'
     | 'APPLE_SWIFTUI'
     | 'APPLE_UIKIT'
     | 'ANDROID_COMPOSE'
@@ -136,6 +147,8 @@ export interface ExportConfiguration {
   mimeType:
     | 'application/json'
     | 'text/css'
+    | 'text/x-scss'
+    | 'text/x-less'
     | 'text/javascript'
     | 'text/swift'
     | 'text/x-kotlin'
