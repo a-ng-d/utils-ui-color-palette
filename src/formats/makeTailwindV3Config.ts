@@ -60,7 +60,7 @@ const makeTailwindV3Config = (paletteData: PaletteData) => {
       })
     })
 
-  return `/** @type {import('tailwindcss').Config} */\nmodule.exports = ${JSON.stringify(
+  return `/** @type {${'i'}mport('tailwindcss').Config} */\n\nmodule.exports = ${JSON.stringify(
     json,
     null,
     '  '
