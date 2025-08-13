@@ -17,6 +17,7 @@ const makeCssCustomProps = (
   const setValueAccordingToColorSpace = (shade: PaletteDataShadeItem) => {
     if (isNaN(shade.hsl[0])) shade.hsl[0] = 0
     if (isNaN(shade.lch[2])) shade.lch[2] = 0
+    if (isNaN(shade.oklch[2])) shade.oklch[2] = 0
 
     const actions: { [action: string]: () => void } = {
       RGB: () =>
@@ -47,6 +48,10 @@ const makeCssCustomProps = (
     shade: PaletteDataShadeItem,
     source: PaletteDataShadeItem
   ) => {
+    if (isNaN(shade.hsl[0])) shade.hsl[0] = 0
+    if (isNaN(shade.lch[2])) shade.lch[2] = 0
+    if (isNaN(shade.oklch[2])) shade.oklch[2] = 0
+
     const actions: { [action: string]: () => void } = {
       RGB: () =>
         `rgb(${Math.floor(source.rgb[0])}, ${Math.floor(
