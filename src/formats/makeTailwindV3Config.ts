@@ -60,13 +60,11 @@ const makeTailwindV3Config = (paletteData: PaletteData) => {
       })
     })
 
-  const prefix = 'i'
-  const suffix = 'mport'
-  return `/** @type {${prefix + suffix}('tailwindcss').Config} */\n\nmodule.exports = ${JSON.stringify(
+  return `/** @type {import('tailwindcss').Config} */\n\nmodule.exports = ${JSON.stringify(
     json,
     null,
     '  '
-  )}`
+  ).replace(/import/g, '\\u0069\\u006d\\u0070\\u006f\\u0072\\u0074')}`
 }
 
 export default makeTailwindV3Config
