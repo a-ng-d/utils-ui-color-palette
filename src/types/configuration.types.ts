@@ -131,7 +131,7 @@ export interface ExportConfiguration {
   context:
     | 'TOKENS_NATIVE'
     | 'TOKENS_DTCG'
-    | 'TOKENS_STYLE_DICTIONARY_3'
+    | 'TOKENS_STYLE_DICTIONARY_V3'
     | 'TOKENS_UNIVERSAL'
     | 'STYLESHEET_CSS'
     | 'STYLESHEET_SCSS'
