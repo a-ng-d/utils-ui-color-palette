@@ -64,7 +64,7 @@ const makeTailwindV3Config = (paletteData: PaletteData) => {
     json,
     null,
     '  '
-  ).replace(/import/g, '\\u0069\\u006d\\u0070\\u006f\\u0072\\u0074')}`
+  )}`
 }
 
 export default makeTailwindV3Config

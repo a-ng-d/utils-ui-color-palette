@@ -143,8 +143,6 @@ export interface ExportConfiguration {
     | 'ANDROID_COMPOSE'
     | 'ANDROID_XML'
     | 'CSV'
-  label: string
-  colorSpace: ColorSpaceConfiguration
   mimeType:
     | 'application/json'
     | 'text/css'
