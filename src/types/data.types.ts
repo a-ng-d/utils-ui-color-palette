@@ -98,8 +98,8 @@ export interface ExternalPalettes {
   themes: Array<ThemeConfiguration>
   color_space: ColorSpaceConfiguration
   algorithm_version: AlgorithmVersionConfiguration
-  creator_avatar: string
-  creator_full_name: string
-  creator_id: string
   is_shared: boolean
+  creator_id: string
+  creator_full_name: string
+  creator_avatar_url: string
 }
