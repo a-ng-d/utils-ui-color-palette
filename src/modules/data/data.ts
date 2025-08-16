@@ -12,24 +12,9 @@ import {
   ScaleConfiguration,
   ThemeConfiguration,
   FullConfiguration,
-  ColorSpaceConfiguration,
 } from '@tps/configuration.types'
 import { Channel, HexModel } from '@tps/color.types'
 import Color from '@modules/color/color'
-import makeUniversalTokens from '../../formats/makeUniversalTokens'
-import makeUIKit from '../../formats/makeUIKit'
-import makeTailwindV4Config from '../../formats/makeTailwindV4Config'
-import makeTailwindV3Config from '../../formats/makeTailwindV3Config'
-import makeSwiftUI from '../../formats/makeSwiftUI'
-import makeStyleDictionaryV3Tokens from '../../formats/makeStyleDictionaryV3Tokens'
-import makeScssVariables from '../../formats/makeScssVariables'
-import makeResources from '../../formats/makeResources'
-import makeNativeTokens from '../../formats/makeNativeTokens'
-import makeLessVariables from '../../formats/makeLessVariables'
-import makeDtcgTokens from '../../formats/makeDtcgTokens'
-import makeCsv from '../../formats/makeCsv'
-import makeCssCustomProps from '../../formats/makeCssCustomProps'
-import makeCompose from '../../formats/makeCompose'
 
 export default class Data {
   private base: BaseConfiguration
@@ -441,90 +426,6 @@ export default class Data {
     )
 
     return libraryData
-  }
-
-  makeNativeTokens = () => {
-    const paletteData = this.makePaletteData()
-
-    return makeNativeTokens(paletteData)
-  }
-
-  makeDtcgTokens = (colorSpace: ColorSpaceConfiguration = 'RGB') => {
-    const paletteData = this.makePaletteData()
-
-    return makeDtcgTokens(paletteData, colorSpace)
-  }
-
-  makeStyleDictionaryV3Tokens = () => {
-    const paletteData = this.makePaletteData()
-
-    return makeStyleDictionaryV3Tokens(paletteData)
-  }
-
-  makeUniversalJson = () => {
-    const paletteData = this.makePaletteData()
-
-    return makeUniversalTokens(paletteData)
-  }
-
-  makeCssCustomProps = (colorSpace: ColorSpaceConfiguration = 'RGB') => {
-    const paletteData = this.makePaletteData()
-
-    return makeCssCustomProps(paletteData, colorSpace)
-  }
-
-  makeScssVariables = (colorSpace: ColorSpaceConfiguration = 'RGB') => {
-    const paletteData = this.makePaletteData()
-
-    return makeScssVariables(paletteData, colorSpace)
-  }
-
-  makeLessVariables = (colorSpace: ColorSpaceConfiguration = 'RGB') => {
-    const paletteData = this.makePaletteData()
-
-    return makeLessVariables(paletteData, colorSpace)
-  }
-
-  makeTailwindV3Config = () => {
-    const paletteData = this.makePaletteData()
-
-    return makeTailwindV3Config(paletteData)
-  }
-
-  makeTailwindV4Config = () => {
-    const paletteData = this.makePaletteData()
-
-    return makeTailwindV4Config(paletteData)
-  }
-
-  makeSwiftUI = () => {
-    const paletteData = this.makePaletteData()
-
-    return makeSwiftUI(paletteData)
-  }
-
-  makeUIKit = () => {
-    const paletteData = this.makePaletteData()
-
-    return makeUIKit(paletteData)
-  }
-
-  makeCompose = () => {
-    const paletteData = this.makePaletteData()
-
-    return makeCompose(paletteData)
-  }
-
-  makeResources = () => {
-    const paletteData = this.makePaletteData()
-
-    return makeResources(paletteData)
-  }
-
-  makeCsv = () => {
-    const paletteData = this.makePaletteData()
-
-    return makeCsv(paletteData)
   }
 
   makePaletteFullData = () => {
