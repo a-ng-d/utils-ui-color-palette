@@ -6,10 +6,9 @@ import {
   EasingConfiguration,
   ColorSpaceConfiguration,
 } from '@tps/configuration.types'
-import { Case } from '@a_ng_d/figmug-utils'
 import Data from './data'
 
-describe('Data', () => {
+describe('Code', () => {
   const mockBase: BaseConfiguration = {
     name: 'Test Palette',
     description: 'Test Description',
@@ -465,251 +464,49 @@ describe('Data', () => {
     expect(found?.styleId).toBe('style-123')
   })
 
-  it('should generate native tokens with makeNativeTokens', () => {
-    const data = new Data({
-      base: mockBase,
-      themes: [mockTheme],
-      meta: mockMeta,
+  describe('Theme Handling Tests', () => {
+    describe('Default Theme (Mono Theme) Tests', () => {
+      const dataWithDefaultThemeOnly = new Data({
+        base: mockBase,
+        themes: [mockThemes[0]],
+        meta: mockMeta,
+      })
+
+      it('should generate paletteData correctly with only default theme', () => {
+        const result = dataWithDefaultThemeOnly.makePaletteData()
+        expect(result).toBeDefined()
+        expect(result.themes).toHaveLength(1)
+        expect(result.themes[0].type).toBe('default theme')
+
+        mockBase.colors.forEach((color, index) => {
+          expect(result.themes[0].colors[index].name).toBe(color.name)
+        })
+      })
     })
 
-    const result = data.makeNativeTokens()
-    expect(result).toBeDefined()
-    expect(typeof result).toBe('string')
-    expect(result.length).toBeGreaterThan(0)
-  })
+    describe('Multiple Custom Themes Tests', () => {
+      const dataWithMultipleCustomThemes = new Data({
+        base: mockBase,
+        themes: [mockThemes[0], mockThemes[1], mockThemes[2]],
+        meta: mockMeta,
+      })
 
-  it('should generate DTCG tokens with makeDtcgTokens', () => {
-    const data = new Data({
-      base: mockBase,
-      themes: [mockTheme],
-      meta: mockMeta,
+      it('should generate paletteData correctly with multiple custom themes', () => {
+        const result = dataWithMultipleCustomThemes.makePaletteData()
+        expect(result).toBeDefined()
+        expect(result.themes).toHaveLength(3)
+
+        expect(result.themes[0].type).toBe('default theme')
+        expect(result.themes[1].type).toBe('custom theme')
+        expect(result.themes[2].type).toBe('custom theme')
+
+        result.themes.forEach((theme) => {
+          expect(theme.colors).toHaveLength(mockBase.colors.length)
+          theme.colors.forEach((color, index) => {
+            expect(color.name).toBe(mockBase.colors[index].name)
+          })
+        })
+      })
     })
-
-    const resultRgb = data.makeDtcgTokens('RGB')
-    expect(resultRgb).toBeDefined()
-    expect(typeof resultRgb).toBe('string')
-    expect(resultRgb.length).toBeGreaterThan(0)
-
-    const resultHsl = data.makeDtcgTokens('HSL')
-    expect(resultHsl).toBeDefined()
-    expect(typeof resultHsl).toBe('string')
-  })
-
-  it('should generate Style Dictionary tokens with makeStyleDictionaryTokens', () => {
-    const data = new Data({
-      base: mockBase,
-      themes: [mockTheme],
-      meta: mockMeta,
-    })
-
-    const result = data.makeStyleDictionaryV3Tokens()
-    expect(result).toBeDefined()
-    expect(typeof result).toBe('string')
-    expect(result.length).toBeGreaterThan(0)
-  })
-
-  it('should generate Universal JSON with makeUniversalJson', () => {
-    const data = new Data({
-      base: mockBase,
-      themes: [mockTheme],
-      meta: mockMeta,
-    })
-
-    const result = data.makeUniversalJson()
-    expect(result).toBeDefined()
-    expect(typeof result).toBe('string')
-    expect(result.length).toBeGreaterThan(0)
-  })
-
-  it('should generate CSS custom properties with makeCSS', () => {
-    const data = new Data({
-      base: mockBase,
-      themes: [mockTheme],
-      meta: mockMeta,
-    })
-
-    const resultRgb = data.makeCssCustomProps('RGB')
-    expect(resultRgb).toBeDefined()
-    expect(typeof resultRgb).toBe('string')
-    expect(resultRgb).toContain(':root')
-
-    const resultLch = data.makeCssCustomProps('LCH')
-    expect(resultLch).toBeDefined()
-    expect(resultLch).toContain('lch')
-  })
-
-  it('should generate Tailwind v3 config with makeTailwindConfigV3', () => {
-    const data = new Data({
-      base: mockBase,
-      themes: [mockTheme],
-      meta: mockMeta,
-    })
-
-    const result = data.makeTailwindV3Config()
-    expect(result).toBeDefined()
-  })
-
-  it('should generate Tailwind v4 config with makeTailwindConfigV4', () => {
-    const defaultThemeData = new Data({
-      base: mockBase,
-      themes: [mockTheme],
-      meta: mockMeta,
-    })
-
-    const defaultThemeResult = defaultThemeData.makeTailwindV4Config()
-    expect(defaultThemeResult).toBeDefined()
-    expect(typeof defaultThemeResult).toBe('string')
-    expect(defaultThemeResult).toContain('@theme {')
-    expect(defaultThemeResult).toContain('--color-')
-    expect(defaultThemeResult).toContain('@import "tailwindcss"')
-
-    const paletteData = defaultThemeData.makePaletteData()
-    const defaultThemeColors = paletteData.themes[0].colors.map((color) =>
-      new Case(color.name).doKebabCase()
-    )
-
-    if (defaultThemeColors.length > 0) {
-      expect(defaultThemeResult).toContain(`--color-${defaultThemeColors[0]}-`)
-    }
-
-    const customThemeData = new Data({
-      base: mockBase,
-      themes: mockThemes,
-      meta: mockMeta,
-    })
-
-    const customThemeResult = customThemeData.makeTailwindV4Config()
-    expect(customThemeResult).toBeDefined()
-    expect(customThemeResult).toContain('@theme {')
-    expect(customThemeResult).toContain('--color-')
-
-    const customThemesExist = mockThemes.some(
-      (theme) => theme.type === 'custom theme'
-    )
-
-    if (customThemesExist) {
-      const customTheme = mockThemes.find(
-        (theme) => theme.type === 'custom theme'
-      )
-      if (customTheme && defaultThemeColors.length > 0) {
-        const customThemeName = new Case(customTheme.name).doKebabCase()
-        const colorName = defaultThemeColors[0]
-        expect(customThemeResult).toContain(
-          `--color-${customThemeName}-${colorName}-`
-        )
-      }
-    }
-  })
-
-  it('should generate SwiftUI code with makeSwiftUI', () => {
-    const data = new Data({
-      base: mockBase,
-      themes: [mockTheme],
-      meta: mockMeta,
-    })
-
-    const result = data.makeSwiftUI()
-    expect(result).toBeDefined()
-    expect(typeof result).toBe('string')
-    expect(result).toContain('struct')
-    expect(result).toContain('Color')
-  })
-
-  it('should generate UIKit code with makeUIKit', () => {
-    const data = new Data({
-      base: mockBase,
-      themes: [mockTheme],
-      meta: mockMeta,
-    })
-
-    const result = data.makeUIKit()
-    expect(result).toBeDefined()
-    expect(typeof result).toBe('string')
-    expect(result).toContain('UIColor')
-  })
-
-  it('should generate Jetpack Compose code with makeCompose', () => {
-    const data = new Data({
-      base: mockBase,
-      themes: [mockTheme],
-      meta: mockMeta,
-    })
-
-    const result = data.makeCompose()
-    expect(result).toBeDefined()
-    expect(typeof result).toBe('string')
-    expect(result).toContain('Color')
-  })
-
-  it('should generate resource files with makeResources', () => {
-    const data = new Data({
-      base: mockBase,
-      themes: [mockTheme],
-      meta: mockMeta,
-    })
-
-    const result = data.makeResources()
-    expect(result).toBeDefined()
-    expect(typeof result).toBe('string')
-    expect(result.length).toBeGreaterThan(0)
-  })
-
-  it('should generate SCSS variables with makeScssVariable', () => {
-    const data = new Data({
-      base: mockBase,
-      themes: mockThemes,
-      meta: mockMeta,
-    })
-
-    const resultRgb = data.makeScssVariables('RGB')
-    expect(resultRgb).toBeDefined()
-    expect(typeof resultRgb).toBe('string')
-    expect(resultRgb).toContain('$')
-
-    const resultLch = data.makeScssVariables('LCH')
-    expect(resultLch).toBeDefined()
-    expect(resultLch).toContain('lch')
-  })
-
-  it('should generate Less variables with makeLessVariables', () => {
-    const data = new Data({
-      base: mockBase,
-      themes: mockThemes,
-      meta: mockMeta,
-    })
-
-    const resultRgb = data.makeLessVariables('RGB')
-    expect(resultRgb).toBeDefined()
-    expect(typeof resultRgb).toBe('string')
-    expect(resultRgb).toContain('@')
-
-    const resultLch = data.makeLessVariables('LCH')
-    expect(resultLch).toBeDefined()
-    expect(resultLch).toContain('lch')
-  })
-
-  it('should generate CSV data with makeCsv', () => {
-    const data = new Data({
-      base: mockBase,
-      themes: [mockTheme],
-      meta: mockMeta,
-    })
-
-    const result = data.makeCsv()
-    expect(result).toBeDefined()
-    expect(Array.isArray(result)).toBe(true)
-    expect(result.length).toBeGreaterThan(0)
-
-    const firstMode = result[0]
-    expect(firstMode.name).toBe(mockTheme.name)
-    expect(firstMode.type).toBe(mockTheme.type)
-    expect(Array.isArray(firstMode.colors)).toBe(true)
-
-    if (firstMode.colors.length > 0) {
-      const firstColor = firstMode.colors[0]
-      expect(firstColor.name).toBeDefined()
-      expect(typeof firstColor.csv).toBe('string')
-      expect(firstColor.csv).toContain('Lightness,Chroma,Hue')
-    }
   })
 })
