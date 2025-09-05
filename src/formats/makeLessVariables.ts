@@ -21,9 +21,9 @@ const makeLessVariables = (
 
     const actions: { [action: string]: () => void } = {
       RGB: () =>
-        `rgb(${Math.floor(shade.rgb[0])}, ${Math.floor(
+        `rgb(${Math.floor(shade.rgb[0])} ${Math.floor(
           shade.rgb[1]
-        )}, ${Math.floor(shade.rgb[2])})`,
+        )} ${Math.floor(shade.rgb[2])})`,
       HEX: () => shade.hex,
       HSL: () =>
         `hsl(${Math.floor(shade.hsl[0])} ${Math.floor(
@@ -50,17 +50,17 @@ const makeLessVariables = (
 
     const actions: { [action: string]: () => void } = {
       RGB: () =>
-        `rgba(${Math.floor(source.rgb[0])}, ${Math.floor(
+        `rgb(${Math.floor(source.rgb[0])} ${Math.floor(
           source.rgb[1]
-        )}, ${Math.floor(source.rgb[2])}, ${shade.alpha?.toFixed(2) ?? 1})`,
+        )} ${Math.floor(source.rgb[2])} / ${shade.alpha?.toFixed(2) ?? 1})`,
       HEX: () =>
         chroma(source.hex)
           .alpha(shade.alpha ?? 1)
           .hex(),
       HSL: () =>
-        `hsla(${Math.floor(source.hsl[0])}, ${Math.floor(
+        `hsl(${Math.floor(source.hsl[0])} ${Math.floor(
           source.hsl[1] * 100
-        )}% ${Math.floor(source.hsl[2] * 100)}% ${shade.alpha?.toFixed(2) ?? 1})`,
+        )}% ${Math.floor(source.hsl[2] * 100)}% / ${shade.alpha?.toFixed(2) ?? 1})`,
       LCH: () =>
         `lch(${Math.floor(source.lch[0])}% ${Math.floor(
           source.lch[1]
