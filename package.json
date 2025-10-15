@@ -1,12 +1,9 @@
 {
-  "name": "@a_ng_d/utils-ui-color-palette",
+  "name": "utils-ui-color-palette",
   "private": false,
   "version": "1.6.4",
   "description": "Core utilities library for UI Color Palette - a color management plugin for design tools. This library provides the foundational color manipulation, contrast calculation, and palette generation features used in the plugin.",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/a-ng-d/utils-ui-color-palette.git"
-  },
+  "repository": "https://github.com/a-ng-d/utils-ui-color-palette",
   "keywords": [
     "color",
     "contrast",
