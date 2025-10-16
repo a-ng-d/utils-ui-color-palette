@@ -29,7 +29,7 @@ export interface BaseConfiguration {
 export interface SourceColorConfiguration {
   name: string
   rgb: RgbModel
-  source: 'CANVAS' | 'REMOTE' | ThirdParty
+  source: 'CANVAS' | 'REMOTE' | 'DEFAULT' | 'IMAGE' | 'HARMONY' | ThirdParty
   id: string
   isRemovable: boolean
   hue?: {
