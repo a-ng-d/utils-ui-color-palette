@@ -16,3 +16,23 @@ export interface HslModel {
 
 export type Channel = [number, number, number]
 export type ChannelWithAlpha = [number, number, number, number]
+
+export interface ImageData {
+  data: Uint8ClampedArray
+  width: number
+  height: number
+}
+
+export interface DominantColorResult {
+  color: Channel
+  hex: HexModel
+  percentage: number
+  count: number
+}
+
+export interface DominantColorsOptions {
+  colorCount?: number
+  maxIterations?: number
+  tolerance?: number
+  skipTransparent?: boolean
+}

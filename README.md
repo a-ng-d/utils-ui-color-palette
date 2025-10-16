@@ -27,6 +27,13 @@ UI Color Palette is available for:
   - Color mixing and blending
   - Brightness and saturation adjustments
 
+- **Dominant Colors Extraction**:
+
+  - Extract dominant colors from images using K-means clustering
+  - Configurable number of colors to extract
+  - Automatic color frequency calculation
+  - Support for transparent pixel filtering
+
 - **Palette Generation**:
   - Create harmonious color schemes
   - Generate accessible color combinations
@@ -43,7 +50,7 @@ yarn add @a_ng_d/utils-ui-color-palette
 ## Usage
 
 ```typescript
-import { Color, Contrast, Data } from '@a_ng_d/utils-ui-color-palette'
+import { Color, Contrast, Data, DominantColors } from '@a_ng_d/utils-ui-color-palette'
 
 // Use Color class for color manipulation
 const color = new Color({
@@ -118,6 +125,50 @@ const minSizes = contrast.getMinFontSizes() // Returns minimum font sizes
 
 // Find specific contrast values
 const lightness = contrast.getLightnessForContrastRatio(4.5) // For WCAG AA
+```
+
+### Dominant Colors Extraction
+
+```typescript
+import { DominantColors } from '@a_ng_d/utils-ui-color-palette'
+
+// Prepare your image data (from canvas, file, etc.)
+const canvas = document.createElement('canvas')
+const ctx = canvas.getContext('2d')
+// ... load your image into the canvas
+const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+
+// Create a dominant colors extractor
+const dominantColors = new DominantColors({
+  imageData: imageData,
+  colorCount: 5, // Extract top 5 colors
+  maxIterations: 50, // K-means algorithm iterations
+  tolerance: 0.01, // Convergence tolerance
+  skipTransparent: true, // Skip transparent pixels
+})
+
+// Extract the dominant colors
+const colors = dominantColors.extractDominantColors()
+
+// Results array contains:
+colors.forEach((result) => {
+  console.log({
+    color: result.color, // RGB array: [r, g, b]
+    hex: result.hex, // Hex string: "#ff0000"
+    percentage: result.percentage, // Percentage of image: 25.5
+    count: result.count, // Number of pixels: 1000
+  })
+})
+
+// Update settings dynamically
+dominantColors.setColorCount(8) // Change to 8 colors
+dominantColors.updateOptions({
+  maxIterations: 100,
+  tolerance: 0.005,
+})
+
+// Get current configuration
+const options = dominantColors.getOptions()
 ```
 
 ### Palette Generation
