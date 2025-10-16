@@ -7,6 +7,9 @@ export type {
   ImageData,
   DominantColorResult,
   DominantColorsOptions,
+  HarmonyType,
+  ColorHarmonyResult,
+  ColorHarmonyOptions,
 } from '@tps/color.types'
 export type {
   BaseConfiguration,
@@ -52,3 +55,4 @@ export { default as Contrast } from '@modules/contrast/contrast'
 export { default as Data } from '@modules/data/data'
 export { default as Code } from '@modules/code/code'
 export { default as DominantColors } from '@modules/dominant-colors/dominant-colors'
+export { default as ColorHarmony } from '@modules/color-harmony/color-harmony'

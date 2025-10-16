@@ -36,3 +36,23 @@ export interface DominantColorsOptions {
   tolerance?: number
   skipTransparent?: boolean
 }
+
+export type HarmonyType =
+  | 'analogous'
+  | 'complementary'
+  | 'triadic'
+  | 'tetradic'
+  | 'square'
+
+export interface ColorHarmonyResult {
+  type: HarmonyType
+  baseColor: Channel
+  baseHex: HexModel
+  colors: Channel[]
+  hexColors: HexModel[]
+}
+
+export interface ColorHarmonyOptions {
+  analogousSpread?: number
+  returnFormat?: 'rgb' | 'hex' | 'both'
+}

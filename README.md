@@ -34,6 +34,13 @@ UI Color Palette is available for:
   - Automatic color frequency calculation
   - Support for transparent pixel filtering
 
+- **Color Harmony Generation**:
+
+  - Generate analogous, complementary, triadic, tetradic, and square color harmonies
+  - Configurable analogous spread angle
+  - Automatic color relationship calculations
+  - Support for all major color harmony types
+
 - **Palette Generation**:
   - Create harmonious color schemes
   - Generate accessible color combinations
@@ -50,7 +57,7 @@ yarn add @a_ng_d/utils-ui-color-palette
 ## Usage
 
 ```typescript
-import { Color, Contrast, Data, DominantColors } from '@a_ng_d/utils-ui-color-palette'
+import { Color, Contrast, Data, DominantColors, ColorHarmony } from '@a_ng_d/utils-ui-color-palette'
 
 // Use Color class for color manipulation
 const color = new Color({
@@ -169,6 +176,43 @@ dominantColors.updateOptions({
 
 // Get current configuration
 const options = dominantColors.getOptions()
+```
+
+### Color Harmony Generation
+
+```typescript
+import { ColorHarmony } from '@a_ng_d/utils-ui-color-palette'
+
+// Create a color harmony generator
+const colorHarmony = new ColorHarmony({
+  baseColor: [255, 0, 0], // Red base color
+  analogousSpread: 30, // 30 degrees for analogous colors
+})
+
+// Generate specific harmony types
+const analogous = colorHarmony.generateAnalogous()
+const complementary = colorHarmony.generateComplementary()
+const triadic = colorHarmony.generateTriadic()
+const tetradic = colorHarmony.generateTetradic()
+const square = colorHarmony.generateSquare()
+
+// Generate harmony by type
+const harmony = colorHarmony.generateHarmony('triadic')
+
+// Generate all harmonies at once
+const allHarmonies = colorHarmony.getAllHarmonies()
+
+// Results contain both RGB and hex values
+console.log(triadic.colors)    // [[255, 0, 0], [0, 255, 0], [0, 0, 255]]
+console.log(triadic.hexColors) // ['#ff0000', '#00ff00', '#0000ff']
+
+// Update settings
+colorHarmony.setBaseColor([0, 128, 255])
+colorHarmony.setAnalogousSpread(45)
+colorHarmony.updateOptions({
+  analogousSpread: 60,
+  returnFormat: 'hex',
+})
 ```
 
 ### Palette Generation
