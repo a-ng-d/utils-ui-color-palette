@@ -57,7 +57,13 @@ yarn add @a_ng_d/utils-ui-color-palette
 ## Usage
 
 ```typescript
-import { Color, Contrast, Data, DominantColors, ColorHarmony } from '@a_ng_d/utils-ui-color-palette'
+import {
+  Color,
+  Contrast,
+  Data,
+  DominantColors,
+  ColorHarmony,
+} from '@a_ng_d/utils-ui-color-palette'
 
 // Use Color class for color manipulation
 const color = new Color({
@@ -203,7 +209,7 @@ const harmony = colorHarmony.generateHarmony('triadic')
 const allHarmonies = colorHarmony.getAllHarmonies()
 
 // Results contain both RGB and hex values
-console.log(triadic.colors)    // [[255, 0, 0], [0, 255, 0], [0, 0, 255]]
+console.log(triadic.colors) // [[255, 0, 0], [0, 255, 0], [0, 0, 255]]
 console.log(triadic.hexColors) // ['#ff0000', '#00ff00', '#0000ff']
 
 // Update settings
@@ -265,15 +271,15 @@ yarn test
 
 Current test coverage results:
 
-| File        | % Stmts | % Branch | % Funcs | % Lines |
-| ----------- | ------- | -------- | ------- | ------- |
-| All files   | 79.82   | 81.81    | 81.42   | 79.82   |
-| color       | 72.02   | 72.36    | 69.04   | 72.02   |
-| color.ts    | 72.02   | 72.36    | 69.04   | 72.02   |
-| contrast    | 89      | 93.02    | 100     | 89      |
-| contrast.ts | 89      | 93.02    | 100     | 89      |
-| data        | 85.99   | 83.73    | 100     | 85.99   |
-| data.ts     | 85.99   | 83.73    | 100     | 85.99   |
+| File              | % Stmts | % Branch | % Funcs | % Lines |
+| ----------------- | ------- | -------- | ------- | ------- |
+| **All files**     | **94.29** | **85.63** | **92.3** | **94.29** |
+| code              | 100     | 100      | 100     | 100     |
+| color             | 92.06   | 72.38    | 80.95   | 92.06   |
+| color-harmony     | 100     | 96.42    | 100     | 100     |
+| contrast          | 89      | 93.02    | 100     | 89      |
+| data              | 92.69   | 84.74    | 100     | 92.69   |
+| dominant-colors   | 100     | 100      | 100     | 100     |
 
 To run coverage tests:
 
