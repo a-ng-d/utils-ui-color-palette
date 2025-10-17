@@ -184,6 +184,52 @@ dominantColors.updateOptions({
 const options = dominantColors.getOptions()
 ```
 
+#### Working with File Uploads (ArrayBuffer)
+
+For modern web applications that need to extract colors from uploaded image files:
+
+```typescript
+import { DominantColors } from '@a_ng_d/utils-ui-color-palette'
+
+// Handle file upload from user input
+const handleImageUpload = async (event: Event) => {
+  const file = (event.target as HTMLInputElement).files?.[0]
+  if (!file) return
+
+  // Convert file to ArrayBuffer
+  const arrayBuffer = await file.arrayBuffer()
+
+  try {
+    // Simple usage: extract 5 dominant colors
+    const colors = await DominantColors.extract(arrayBuffer, 5)
+    
+    console.log('Extracted colors:', colors)
+    // Each color object contains: { color, hex, percentage, count }
+    
+  } catch (error) {
+    console.error('Error extracting colors:', error)
+  }
+}
+
+// Advanced usage with custom options
+const extractColorsAdvanced = async (arrayBuffer: ArrayBuffer) => {
+  const colors = await DominantColors.fromArrayBuffer(arrayBuffer, {
+    colorCount: 8,
+    maxIterations: 100,
+    tolerance: 0.005,
+    skipTransparent: true,
+    maxImageSize: 300, // Resize large images for faster processing
+  })
+
+  return colors
+}
+
+// HTML file input example
+// <input type="file" accept="image/*" onChange={handleImageUpload} />
+```
+
+**Note**: ArrayBuffer extraction requires a browser environment with Canvas API support.
+
 ### Color Harmony Generation
 
 ```typescript
