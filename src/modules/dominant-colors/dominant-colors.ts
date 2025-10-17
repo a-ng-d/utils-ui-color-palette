@@ -7,30 +7,155 @@ import {
   DominantColorsOptions,
 } from '@tps/color.types'
 
+interface DominantColorsInput extends DominantColorsOptions {
+  imageData?: ImageData
+  arrayBuffer?: ArrayBuffer
+  maxImageSize?: number
+}
+
 export default class DominantColors {
-  private imageData: ImageData
+  private imageData: ImageData | null = null
   private colorCount: number
   private maxIterations: number
   private tolerance: number
   private skipTransparent: boolean
+  private maxImageSize: number
 
   constructor({
     imageData,
+    arrayBuffer,
     colorCount = 5,
     maxIterations = 50,
     tolerance = 0.01,
     skipTransparent = true,
-  }: {
-    imageData: ImageData
-  } & DominantColorsOptions) {
-    this.imageData = imageData
+    maxImageSize = 200,
+  }: DominantColorsInput) {
+    if (!imageData && !arrayBuffer) {
+      throw new Error('Either imageData or arrayBuffer must be provided')
+    }
+
+    this.imageData = imageData || null
     this.colorCount = colorCount
     this.maxIterations = maxIterations
     this.tolerance = tolerance
     this.skipTransparent = skipTransparent
+    this.maxImageSize = maxImageSize
+
+    if (arrayBuffer && !imageData) {
+      this.arrayBuffer = arrayBuffer
+    }
   }
 
+  private arrayBuffer?: ArrayBuffer
+
+  private async ensureImageData(): Promise<void> {
+    if (!this.imageData && this.arrayBuffer) {
+      this.imageData = await this.decodeImageFromArrayBuffer(this.arrayBuffer)
+    }
+  }
+
+  private async decodeImageFromArrayBuffer(
+    arrayBuffer: ArrayBuffer
+  ): Promise<ImageData> {
+    return new Promise((resolve, reject) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const globalWindow = globalThis as any
+
+      if (!globalWindow.document || !globalWindow.Image || !globalWindow.URL) {
+        reject(new Error('Browser environment with Canvas API required'))
+        return
+      }
+
+      const blob = new globalWindow.Blob([arrayBuffer])
+      const url = globalWindow.URL.createObjectURL(blob)
+      const img = new globalWindow.Image()
+
+      img.onload = () => {
+        try {
+          const canvas = globalWindow.document.createElement('canvas')
+          const ctx = canvas.getContext('2d')
+
+          if (!ctx) {
+            throw new Error('Failed to create canvas context')
+          }
+
+          // Resize image if needed
+          const aspectRatio = img.width / img.height
+          let targetWidth = img.width
+          let targetHeight = img.height
+
+          if (Math.max(img.width, img.height) > this.maxImageSize) {
+            if (img.width > img.height) {
+              targetWidth = this.maxImageSize
+              targetHeight = Math.round(this.maxImageSize / aspectRatio)
+            } else {
+              targetHeight = this.maxImageSize
+              targetWidth = Math.round(this.maxImageSize * aspectRatio)
+            }
+          }
+
+          canvas.width = targetWidth
+          canvas.height = targetHeight
+
+          ctx.drawImage(img, 0, 0, targetWidth, targetHeight)
+
+          const browserImageData = ctx.getImageData(
+            0,
+            0,
+            targetWidth,
+            targetHeight
+          )
+
+          const imageData: ImageData = {
+            data: new Uint8ClampedArray(browserImageData.data),
+            width: browserImageData.width,
+            height: browserImageData.height,
+          }
+
+          globalWindow.URL.revokeObjectURL(url)
+          resolve(imageData)
+        } catch (error) {
+          globalWindow.URL.revokeObjectURL(url)
+          reject(error)
+        }
+      }
+
+      img.onerror = () => {
+        globalWindow.URL.revokeObjectURL(url)
+        reject(new Error('Failed to load image'))
+      }
+
+      img.src = url
+    })
+  }
+
+  /** Synchronous extraction for ImageData (backward compatibility) */
   extractDominantColors = (): DominantColorResult[] => {
+    if (!this.imageData) {
+      throw new Error(
+        'No image data available. Use extractDominantColorsAsync() for ArrayBuffer.'
+      )
+    }
+
+    const pixels = this.extractPixels()
+    if (pixels.length === 0) return []
+
+    const clusters = this.performKMeans(pixels)
+    const results = this.calculateColorFrequencies(pixels, clusters)
+
+    return results.sort((a, b) => b.percentage - a.percentage)
+  }
+
+  /** Asynchronous extraction for ArrayBuffer */
+  extractDominantColorsAsync = async (): Promise<DominantColorResult[]> => {
+    await this.ensureImageData()
+
+    if (!this.imageData) {
+      throw new Error(
+        'No image data available. Ensure ArrayBuffer was successfully decoded.'
+      )
+    }
+
     const pixels = this.extractPixels()
     if (pixels.length === 0) return []
 
@@ -41,6 +166,10 @@ export default class DominantColors {
   }
 
   private extractPixels = (): Channel[] => {
+    if (!this.imageData) {
+      throw new Error('No image data available')
+    }
+
     const pixels: Channel[] = []
     const data = this.imageData.data
 
@@ -215,4 +344,25 @@ export default class DominantColors {
     tolerance: this.tolerance,
     skipTransparent: this.skipTransparent,
   })
+
+  /** Static method for simplified ArrayBuffer usage */
+  static async fromArrayBuffer(
+    arrayBuffer: ArrayBuffer,
+    options: Omit<DominantColorsInput, 'arrayBuffer' | 'imageData'> = {}
+  ): Promise<DominantColorResult[]> {
+    const decoder = new DominantColors({
+      arrayBuffer,
+      ...options,
+    })
+
+    return decoder.extractDominantColorsAsync()
+  }
+
+  /** Simplified static method for quick color extraction */
+  static async extract(
+    arrayBuffer: ArrayBuffer,
+    colorCount: number = 5
+  ): Promise<DominantColorResult[]> {
+    return this.fromArrayBuffer(arrayBuffer, { colorCount })
+  }
 }
