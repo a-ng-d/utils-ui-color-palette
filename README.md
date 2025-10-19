@@ -249,7 +249,7 @@ const tetradic = colorHarmony.generateTetradic()
 const square = colorHarmony.generateSquare()
 
 // Generate harmony by type
-const harmony = colorHarmony.generateHarmony('triadic')
+const harmony = colorHarmony.generateHarmony('TRIADIC')
 
 // Generate all harmonies at once
 const allHarmonies = colorHarmony.getAllHarmonies()

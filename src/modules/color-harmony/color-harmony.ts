@@ -42,7 +42,7 @@ export default class ColorHarmony {
       ),
     ]
 
-    return this.formatResult('analogous', colors)
+    return this.formatResult('ANALOGOUS', colors)
   }
 
   generateComplementary = (): ColorHarmonyResult => {
@@ -54,7 +54,7 @@ export default class ColorHarmony {
       this.hueToRgb(this.normalizeHue(baseHue + 180), hsl[1], hsl[2]),
     ]
 
-    return this.formatResult('complementary', colors)
+    return this.formatResult('COMPLEMENTARY', colors)
   }
 
   generateTriadic = (): ColorHarmonyResult => {
@@ -67,7 +67,7 @@ export default class ColorHarmony {
       this.hueToRgb(this.normalizeHue(baseHue + 240), hsl[1], hsl[2]),
     ]
 
-    return this.formatResult('triadic', colors)
+    return this.formatResult('TRIADIC', colors)
   }
 
   generateTetradic = (): ColorHarmonyResult => {
@@ -81,7 +81,7 @@ export default class ColorHarmony {
       this.hueToRgb(this.normalizeHue(baseHue + 270), hsl[1], hsl[2]),
     ]
 
-    return this.formatResult('tetradic', colors)
+    return this.formatResult('TETRADIC', colors)
   }
 
   generateSquare = (): ColorHarmonyResult => {
@@ -95,20 +95,20 @@ export default class ColorHarmony {
       this.hueToRgb(this.normalizeHue(baseHue + 270), hsl[1], hsl[2]),
     ]
 
-    return this.formatResult('square', colors)
+    return this.formatResult('SQUARE', colors)
   }
 
   generateHarmony = (type: HarmonyType): ColorHarmonyResult => {
     switch (type) {
-      case 'analogous':
+      case 'ANALOGOUS':
         return this.generateAnalogous()
-      case 'complementary':
+      case 'COMPLEMENTARY':
         return this.generateComplementary()
-      case 'triadic':
+      case 'TRIADIC':
         return this.generateTriadic()
-      case 'tetradic':
+      case 'TETRADIC':
         return this.generateTetradic()
-      case 'square':
+      case 'SQUARE':
         return this.generateSquare()
       default:
         throw new Error(`Unknown harmony type: ${type}`)

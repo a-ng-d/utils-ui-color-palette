@@ -38,11 +38,11 @@ export interface DominantColorsOptions {
 }
 
 export type HarmonyType =
-  | 'analogous'
-  | 'complementary'
-  | 'triadic'
-  | 'tetradic'
-  | 'square'
+  | 'ANALOGOUS'
+  | 'COMPLEMENTARY'
+  | 'TRIADIC'
+  | 'TETRADIC'
+  | 'SQUARE'
 
 export interface ColorHarmonyResult {
   type: HarmonyType

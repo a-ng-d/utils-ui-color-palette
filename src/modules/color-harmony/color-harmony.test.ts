@@ -39,7 +39,7 @@ describe('ColorHarmony', () => {
     it('should generate analogous colors', () => {
       const result = colorHarmony.generateAnalogous()
 
-      expect(result.type).toBe('analogous')
+      expect(result.type).toBe('ANALOGOUS')
       expect(result.baseColor).toEqual([255, 0, 0])
       expect(result.colors).toHaveLength(3)
       expect(result.hexColors).toHaveLength(3)
@@ -53,7 +53,7 @@ describe('ColorHarmony', () => {
     it('should generate complementary colors', () => {
       const result = colorHarmony.generateComplementary()
 
-      expect(result.type).toBe('complementary')
+      expect(result.type).toBe('COMPLEMENTARY')
       expect(result.colors).toHaveLength(2)
       expect(result.hexColors).toHaveLength(2)
 
@@ -64,7 +64,7 @@ describe('ColorHarmony', () => {
     it('should generate triadic colors', () => {
       const result = colorHarmony.generateTriadic()
 
-      expect(result.type).toBe('triadic')
+      expect(result.type).toBe('TRIADIC')
       expect(result.colors).toHaveLength(3)
       expect(result.hexColors).toHaveLength(3)
       expect(result.colors[0]).toEqual([255, 0, 0])
@@ -73,7 +73,7 @@ describe('ColorHarmony', () => {
     it('should generate tetradic colors', () => {
       const result = colorHarmony.generateTetradic()
 
-      expect(result.type).toBe('tetradic')
+      expect(result.type).toBe('TETRADIC')
       expect(result.colors).toHaveLength(4)
       expect(result.hexColors).toHaveLength(4)
       expect(result.colors[0]).toEqual([255, 0, 0])
@@ -82,7 +82,7 @@ describe('ColorHarmony', () => {
     it('should generate square colors', () => {
       const result = colorHarmony.generateSquare()
 
-      expect(result.type).toBe('square')
+      expect(result.type).toBe('SQUARE')
       expect(result.colors).toHaveLength(4)
       expect(result.hexColors).toHaveLength(4)
       expect(result.colors[0]).toEqual([255, 0, 0])
@@ -92,11 +92,11 @@ describe('ColorHarmony', () => {
   describe('Generic harmony generation', () => {
     it('should generate harmony by type', () => {
       const types: HarmonyType[] = [
-        'analogous',
-        'complementary',
-        'triadic',
-        'tetradic',
-        'square',
+        'ANALOGOUS',
+        'COMPLEMENTARY',
+        'TRIADIC',
+        'TETRADIC',
+        'SQUARE',
       ]
 
       types.forEach((type) => {
@@ -119,11 +119,11 @@ describe('ColorHarmony', () => {
       expect(allHarmonies).toHaveLength(5)
 
       const types = allHarmonies.map((h) => h.type)
-      expect(types).toContain('analogous')
-      expect(types).toContain('complementary')
-      expect(types).toContain('triadic')
-      expect(types).toContain('tetradic')
-      expect(types).toContain('square')
+      expect(types).toContain('ANALOGOUS')
+      expect(types).toContain('COMPLEMENTARY')
+      expect(types).toContain('TRIADIC')
+      expect(types).toContain('TETRADIC')
+      expect(types).toContain('SQUARE')
     })
   })
 
