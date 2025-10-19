@@ -36,7 +36,7 @@ UI Color Palette is available for:
 
 - **Color Harmony Generation**:
 
-  - Generate analogous, complementary, triadic, tetradic, and square color harmonies
+  - Generate analogous, complementary, triadic, tetradic, square, and compound color harmonies
   - Configurable analogous spread angle
   - Automatic color relationship calculations
   - Support for all major color harmony types
@@ -247,11 +247,12 @@ const complementary = colorHarmony.generateComplementary()
 const triadic = colorHarmony.generateTriadic()
 const tetradic = colorHarmony.generateTetradic()
 const square = colorHarmony.generateSquare()
+const compound = colorHarmony.generateCompound()
 
 // Generate harmony by type
 const harmony = colorHarmony.generateHarmony('TRIADIC')
 
-// Generate all harmonies at once
+// Generate all harmonies at once (now includes 6 harmonies)
 const allHarmonies = colorHarmony.getAllHarmonies()
 
 // Results contain both RGB and hex values

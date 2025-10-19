@@ -43,6 +43,7 @@ export type HarmonyType =
   | 'TRIADIC'
   | 'TETRADIC'
   | 'SQUARE'
+  | 'COMPOUND'
 
 export interface ColorHarmonyResult {
   type: HarmonyType

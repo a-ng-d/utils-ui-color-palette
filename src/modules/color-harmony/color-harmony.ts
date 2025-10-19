@@ -98,6 +98,20 @@ export default class ColorHarmony {
     return this.formatResult('SQUARE', colors)
   }
 
+  generateCompound = (): ColorHarmonyResult => {
+    const hsl = chroma(this.baseColor).hsl()
+    const baseHue = hsl[0] || 0
+    const complementaryHue = this.normalizeHue(baseHue + 180)
+
+    const colors = [
+      this.baseColor,
+      this.hueToRgb(this.normalizeHue(complementaryHue - 30), hsl[1], hsl[2]),
+      this.hueToRgb(this.normalizeHue(complementaryHue + 30), hsl[1], hsl[2]),
+    ]
+
+    return this.formatResult('COMPOUND', colors)
+  }
+
   generateHarmony = (type: HarmonyType): ColorHarmonyResult => {
     switch (type) {
       case 'ANALOGOUS':
@@ -110,6 +124,8 @@ export default class ColorHarmony {
         return this.generateTetradic()
       case 'SQUARE':
         return this.generateSquare()
+      case 'COMPOUND':
+        return this.generateCompound()
       default:
         throw new Error(`Unknown harmony type: ${type}`)
     }
@@ -122,6 +138,7 @@ export default class ColorHarmony {
       this.generateTriadic(),
       this.generateTetradic(),
       this.generateSquare(),
+      this.generateCompound(),
     ]
   }
 

@@ -87,6 +87,15 @@ describe('ColorHarmony', () => {
       expect(result.hexColors).toHaveLength(4)
       expect(result.colors[0]).toEqual([255, 0, 0])
     })
+
+    it('should generate compound colors', () => {
+      const result = colorHarmony.generateCompound()
+
+      expect(result.type).toBe('COMPOUND')
+      expect(result.colors).toHaveLength(3)
+      expect(result.hexColors).toHaveLength(3)
+      expect(result.colors[0]).toEqual([255, 0, 0])
+    })
   })
 
   describe('Generic harmony generation', () => {
@@ -97,6 +106,7 @@ describe('ColorHarmony', () => {
         'TRIADIC',
         'TETRADIC',
         'SQUARE',
+        'COMPOUND',
       ]
 
       types.forEach((type) => {
@@ -116,7 +126,7 @@ describe('ColorHarmony', () => {
     it('should generate all harmonies at once', () => {
       const allHarmonies = colorHarmony.getAllHarmonies()
 
-      expect(allHarmonies).toHaveLength(5)
+      expect(allHarmonies).toHaveLength(6)
 
       const types = allHarmonies.map((h) => h.type)
       expect(types).toContain('ANALOGOUS')
@@ -124,6 +134,7 @@ describe('ColorHarmony', () => {
       expect(types).toContain('TRIADIC')
       expect(types).toContain('TETRADIC')
       expect(types).toContain('SQUARE')
+      expect(types).toContain('COMPOUND')
     })
   })
 
