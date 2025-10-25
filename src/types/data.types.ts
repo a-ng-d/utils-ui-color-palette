@@ -102,4 +102,7 @@ export interface ExternalPalettes {
   creator_id: string
   creator_full_name: string
   creator_avatar_url: string
+  org_id?: string
+  org_name?: string
+  org_avatar_url?: string
 }
