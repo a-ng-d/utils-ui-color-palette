@@ -105,4 +105,6 @@ export interface ExternalPalettes {
   org_id?: string
   org_name?: string
   org_avatar_url?: string
+  star_count?: number
+  add_count?: number
 }
