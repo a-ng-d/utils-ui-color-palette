@@ -33,3 +33,5 @@ jobs:
 
     - name: Publish if version has been updated
       run: npm publish --access public
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
