@@ -9,7 +9,6 @@ import {
 import {
   MetaConfiguration,
   BaseConfiguration,
-  ScaleConfiguration,
   ThemeConfiguration,
   FullConfiguration,
 } from '@tps/configuration.types'
@@ -21,7 +20,6 @@ export default class Data {
   private themes: Array<ThemeConfiguration>
   private meta?: MetaConfiguration
   private paletteData: PaletteData
-  private currentScale: ScaleConfiguration
 
   constructor({
     base,
@@ -41,9 +39,6 @@ export default class Data {
       themes: [],
       type: 'palette',
     }
-    this.currentScale =
-      themes.find((theme) => theme.isEnabled)?.scale ??
-      ({} as ScaleConfiguration)
   }
 
   makePaletteData = () => {
@@ -248,9 +243,8 @@ export default class Data {
             'rgb'
           )
           const scaleName: string =
-            Object.keys(this.currentScale).find(
-              (key) => key === scaledColor[0][0]
-            ) ?? '0'
+            Object.keys(theme.scale).find((key) => key === scaledColor[0][0]) ??
+            '0'
           const newHsluv = new Hsluv()
           const simulatedSourceColorRgb = new Color({
             render: 'RGB',

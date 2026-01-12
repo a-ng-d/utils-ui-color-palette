@@ -67,7 +67,7 @@ describe('Code', () => {
   }
 
   const mockTheme: ThemeConfiguration = {
-    id: 'theme1',
+    id: '00000000000',
     name: 'Test Theme',
     description: 'A test theme',
     type: 'default theme',
@@ -507,6 +507,89 @@ describe('Code', () => {
           })
         })
       })
+
+      it('should preserve scale names for each theme correctly', () => {
+        const result = dataWithMultipleCustomThemes.makePaletteData()
+
+        result.themes.forEach((theme) => {
+          const firstColor = theme.colors[0]
+          const scaleShades = firstColor.shades.filter(
+            (shade) => shade.type !== 'source color'
+          )
+          const shadeNames = scaleShades.map((shade) => shade.name)
+
+          expect(shadeNames).toContain('100')
+          expect(shadeNames).toContain('50')
+          expect(shadeNames).not.toContain('0')
+        })
+
+        const theme0 = result.themes[0].colors[0].shades.find(
+          (s) => s.name === '100'
+        )
+        const theme1 = result.themes[1].colors[0].shades.find(
+          (s) => s.name === '100'
+        )
+        const theme2 = result.themes[2].colors[0].shades.find(
+          (s) => s.name === '100'
+        )
+
+        expect(theme0?.description).toContain('100.0% of lightness')
+        expect(theme1?.description).toContain('75.0% of lightness')
+        expect(theme2?.description).toContain('50.0% of lightness')
+      })
+    })
+  })
+
+  describe('Library Data ID Preservation with Multiple Themes', () => {
+    it('should preserve variableId and styleId across multiple themes', () => {
+      const data = new Data({
+        base: mockBase,
+        themes: mockThemes,
+        meta: mockMeta,
+      })
+
+      const initialLibraryData = data.makeLibraryData()
+
+      const previousData = [
+        {
+          ...initialLibraryData[0],
+          variableId: 'var-theme0-color0',
+          styleId: 'style-theme0-color0',
+          collectionId: 'coll-001',
+          modeId: 'mode-001',
+        },
+        {
+          ...initialLibraryData[initialLibraryData.length - 1],
+          variableId: 'var-last-item',
+          styleId: 'style-last-item',
+          collectionId: 'coll-999',
+          modeId: 'mode-999',
+        },
+      ]
+
+      const result = data.makeLibraryData(
+        ['variable_id', 'style_id', 'collection_id', 'mode_id'],
+        previousData
+      )
+
+      const firstItem = result.find(
+        (item) => item.id === initialLibraryData[0].id
+      )
+      expect(firstItem).toBeDefined()
+      expect(firstItem?.variableId).toBe('var-theme0-color0')
+      expect(firstItem?.styleId).toBe('style-theme0-color0')
+      expect(firstItem?.collectionId).toBe('coll-001')
+      expect(firstItem?.modeId).toBe('mode-001')
+
+      const lastItem = result.find(
+        (item) =>
+          item.id === initialLibraryData[initialLibraryData.length - 1].id
+      )
+      expect(lastItem).toBeDefined()
+      expect(lastItem?.variableId).toBe('var-last-item')
+      expect(lastItem?.styleId).toBe('style-last-item')
+      expect(lastItem?.collectionId).toBe('coll-999')
+      expect(lastItem?.modeId).toBe('mode-999')
     })
   })
 })
