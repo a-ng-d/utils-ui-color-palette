@@ -1,9 +1,14 @@
 name: Publish a new version on npm
 
 on:
-  push:
+  pull_request:
+    types: [closed]
     branches:
       - main
+
+permissions:
+  contents: read
+  id-token: write
 
 jobs:
   npm:
@@ -16,20 +21,16 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: 20
+        registry-url: 'https://registry.npmjs.org'
 
     - name: Install dependencies
-      run: |
-        npm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_TOKEN }}
-        npm install
-
-    - name: Run tests
-      run: npm run test
+      run: npm ci
 
     - name: Build module
       run: npm run build
 
     - name: Publish if version has been updated
-      uses: JS-DevTools/npm-publish@v3
-      with:
-        token: ${{ secrets.NPM_TOKEN }}
-        access: public
+      run: npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        NPM_CONFIG_PROVENANCE: true
