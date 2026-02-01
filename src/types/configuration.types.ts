@@ -89,6 +89,7 @@ export type ScaleConfiguration = Record<string, number>
 
 export interface ShiftConfiguration {
   chroma: number
+  hue: number
 }
 
 export type LockedSourceColorsConfiguration = boolean
