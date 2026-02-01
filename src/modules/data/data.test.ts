@@ -22,6 +22,7 @@ describe('Code', () => {
     },
     shift: {
       chroma: 100,
+      hue: 0,
     },
     colors: [
       {
@@ -325,6 +326,7 @@ describe('Code', () => {
       },
       shift: {
         chroma: 0,
+        hue: 0,
       },
       colors: [],
       colorSpace: 'LCH' as const,

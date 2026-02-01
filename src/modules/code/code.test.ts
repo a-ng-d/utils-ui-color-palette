@@ -21,6 +21,7 @@ describe('Data', () => {
     },
     shift: {
       chroma: 100,
+      hue: 0,
     },
     colors: [
       {
