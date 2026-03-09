@@ -258,7 +258,16 @@ describe('Code', () => {
   })
 
   it('should handle all color space configurations', () => {
-    const colorSpaces = ['LCH', 'OKLCH', 'LAB', 'OKLAB', 'HSL', 'HSLUV']
+    const colorSpaces = [
+      'LCH',
+      'OKLCH',
+      'LAB',
+      'OKLAB',
+      'HSL',
+      'HSLUV',
+      'HSV',
+      'CMYK',
+    ]
 
     colorSpaces.forEach((space) => {
       const baseWithColorSpace: BaseConfiguration = {
@@ -592,6 +601,211 @@ describe('Code', () => {
       expect(lastItem?.styleId).toBe('style-last-item')
       expect(lastItem?.collectionId).toBe('coll-999')
       expect(lastItem?.modeId).toBe('mode-999')
+    })
+  })
+
+  describe('HSV color space', () => {
+    const baseHsv: BaseConfiguration = {
+      ...mockBase,
+      colorSpace: 'HSV' as ColorSpaceConfiguration,
+      colors: [mockBase.colors[0]],
+    }
+
+    it('should generate shades with HSV color space', () => {
+      const data = new Data({
+        base: baseHsv,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+      const result = data.makePaletteData()
+
+      expect(result.themes[0].colors[0].shades.length).toBeGreaterThan(0)
+    })
+
+    it('should include hsv and cmyk fields on every shade', () => {
+      const data = new Data({
+        base: baseHsv,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+      const result = data.makePaletteData()
+
+      result.themes[0].colors[0].shades.forEach((shade) => {
+        expect(shade.hsv).toBeDefined()
+        expect(shade.cmyk).toBeDefined()
+      })
+    })
+
+    it('should produce shades different from LCH for the same source color', () => {
+      const dataHsv = new Data({
+        base: baseHsv,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+      const dataLch = new Data({
+        base: { ...baseHsv, colorSpace: 'LCH' as ColorSpaceConfiguration },
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+
+      const hsvShades = dataHsv.makePaletteData().themes[0].colors[0].shades
+      const lchShades = dataLch.makePaletteData().themes[0].colors[0].shades
+
+      const hsvHexes = hsvShades
+        .filter((s) => s.type !== 'source color')
+        .map((s) => s.hex)
+      const lchHexes = lchShades
+        .filter((s) => s.type !== 'source color')
+        .map((s) => s.hex)
+
+      expect(hsvHexes).not.toEqual(lchHexes)
+    })
+
+    it('should handle alpha-enabled colors with HSV', () => {
+      const baseHsvAlpha: BaseConfiguration = {
+        ...baseHsv,
+        colors: [mockBase.colors[2]],
+      }
+      const data = new Data({
+        base: baseHsvAlpha,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+      const result = data.makePaletteData()
+
+      const alphaShades = result.themes[0].colors[0].shades.filter(
+        (s) => s.type !== 'source color'
+      )
+      expect(alphaShades.some((s) => s.isTransparent)).toBe(true)
+    })
+
+    it('should handle locked source colors with HSV', () => {
+      const baseHsvLocked: BaseConfiguration = {
+        ...baseHsv,
+        areSourceColorsLocked: true,
+      }
+      const data = new Data({
+        base: baseHsvLocked,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+      const result = data.makePaletteData()
+
+      expect(
+        result.themes[0].colors[0].shades.some((s) => s.isSourceColorLocked)
+      ).toBe(true)
+    })
+  })
+
+  describe('CMYK color space', () => {
+    const baseCmyk: BaseConfiguration = {
+      ...mockBase,
+      colorSpace: 'CMYK' as ColorSpaceConfiguration,
+      colors: [mockBase.colors[0]],
+    }
+
+    it('should generate shades with CMYK color space', () => {
+      const data = new Data({
+        base: baseCmyk,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+      const result = data.makePaletteData()
+
+      expect(result.themes[0].colors[0].shades.length).toBeGreaterThan(0)
+    })
+
+    it('should include hsv and cmyk fields on every shade', () => {
+      const data = new Data({
+        base: baseCmyk,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+      const result = data.makePaletteData()
+
+      result.themes[0].colors[0].shades.forEach((shade) => {
+        expect(shade.hsv).toBeDefined()
+        expect(shade.cmyk).toBeDefined()
+        expect(shade.cmyk).toHaveLength(4)
+      })
+    })
+
+    it('should produce shades different from LCH for the same source color', () => {
+      const dataCmyk = new Data({
+        base: baseCmyk,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+      const dataLch = new Data({
+        base: { ...baseCmyk, colorSpace: 'LCH' as ColorSpaceConfiguration },
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+
+      const cmykShades = dataCmyk.makePaletteData().themes[0].colors[0].shades
+      const lchShades = dataLch.makePaletteData().themes[0].colors[0].shades
+
+      const cmykHexes = cmykShades
+        .filter((s) => s.type !== 'source color')
+        .map((s) => s.hex)
+      const lchHexes = lchShades
+        .filter((s) => s.type !== 'source color')
+        .map((s) => s.hex)
+
+      expect(cmykHexes).not.toEqual(lchHexes)
+    })
+
+    it('should handle alpha-enabled colors with CMYK', () => {
+      const baseCmykAlpha: BaseConfiguration = {
+        ...baseCmyk,
+        colors: [mockBase.colors[2]],
+      }
+      const data = new Data({
+        base: baseCmykAlpha,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+      const result = data.makePaletteData()
+
+      const alphaShades = result.themes[0].colors[0].shades.filter(
+        (s) => s.type !== 'source color'
+      )
+      expect(alphaShades.some((s) => s.isTransparent)).toBe(true)
+    })
+
+    it('should handle locked source colors with CMYK', () => {
+      const baseCmykLocked: BaseConfiguration = {
+        ...baseCmyk,
+        areSourceColorsLocked: true,
+      }
+      const data = new Data({
+        base: baseCmykLocked,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+      const result = data.makePaletteData()
+
+      expect(
+        result.themes[0].colors[0].shades.some((s) => s.isSourceColorLocked)
+      ).toBe(true)
+    })
+
+    it('should return CMYK values in [0, 1] range for each shade', () => {
+      const data = new Data({
+        base: baseCmyk,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+      const result = data.makePaletteData()
+
+      result.themes[0].colors[0].shades
+        .filter((s) => s.type !== 'source color')
+        .forEach((shade) => {
+          shade.cmyk.forEach((channel) => {
+            expect(channel).toBeGreaterThanOrEqual(0)
+            expect(channel).toBeLessThanOrEqual(1)
+          })
+        })
     })
   })
 })
