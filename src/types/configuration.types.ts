@@ -172,6 +172,8 @@ export type ColorSpaceConfiguration =
   | 'OKLAB'
   | 'HSL'
   | 'HSLUV'
+  | 'HSV'
+  | 'CMYK'
   | 'RGB'
   | 'HEX'
   | 'P3'

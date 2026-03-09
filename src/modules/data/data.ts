@@ -12,8 +12,24 @@ import {
   ThemeConfiguration,
   FullConfiguration,
 } from '@tps/configuration.types'
-import { Channel, HexModel } from '@tps/color.types'
+import { Channel, ChannelWithAlpha, HexModel } from '@tps/color.types'
 import Color from '@modules/color/color'
+
+const rgbToCmyk = (r: number, g: number, b: number): ChannelWithAlpha => {
+  const r1 = r / 255,
+    g1 = g / 255,
+    b1 = b / 255
+  const k = 1 - Math.max(r1, g1, b1)
+
+  if (k === 1) return [0, 0, 0, 1]
+
+  return [
+    (1 - r1 - k) / (1 - k),
+    (1 - g1 - k) / (1 - k),
+    (1 - b1 - k) / (1 - k),
+    k,
+  ]
+}
 
 export default class Data {
   private base: BaseConfiguration
@@ -150,6 +166,30 @@ export default class Data {
                         foregroundColorData.hsluva(),
                         backgroundColorData.hsluva(),
                       ]
+                case 'HSV':
+                  return this.base.areSourceColorsLocked
+                    ? [
+                        lightness,
+                        foregroundColorData.setColorWithAlpha(),
+                        backgroundColorData.setColorWithAlpha(),
+                      ]
+                    : [
+                        lightness,
+                        foregroundColorData.hsva(),
+                        backgroundColorData.hsva(),
+                      ]
+                case 'CMYK':
+                  return this.base.areSourceColorsLocked
+                    ? [
+                        lightness,
+                        foregroundColorData.setColorWithAlpha(),
+                        backgroundColorData.setColorWithAlpha(),
+                      ]
+                    : [
+                        lightness,
+                        foregroundColorData.cmyka(),
+                        backgroundColorData.cmyka(),
+                      ]
                 default:
                   return [lightness, [0, 0, 0], [255, 255, 255]]
               }
@@ -183,6 +223,10 @@ export default class Data {
                   return [lightness, colorData.hsl()]
                 case 'HSLUV':
                   return [lightness, colorData.hsluv()]
+                case 'HSV':
+                  return [lightness, colorData.hsv()]
+                case 'CMYK':
+                  return [lightness, colorData.cmyk()]
                 default:
                   return [lightness, [0, 0, 0]]
               }
@@ -224,6 +268,8 @@ export default class Data {
             sourceHsluv.hsluv_s,
             sourceHsluv.hsluv_l,
           ],
+          hsv: chroma(sourceColor).hsv() as Channel,
+          cmyk: rgbToCmyk(...sourceColor),
           type: 'source color',
         })
 
@@ -326,6 +372,22 @@ export default class Data {
                 ? chroma(simulatedSourceColorHex).hsl()
                 : chroma(scaledColor[1] as Channel).hsl(),
             hsluv: [newHsluv.hsluv_h, newHsluv.hsluv_s, newHsluv.hsluv_l],
+            hsv: (index === minDistanceIndex &&
+            this.base.areSourceColorsLocked &&
+            !color.alpha.isEnabled
+              ? chroma(simulatedSourceColorHex)
+              : chroma(scaledColor[1] as Channel)
+            ).hsv() as Channel,
+            cmyk: (() => {
+              const [r, g, b] = (
+                index === minDistanceIndex &&
+                this.base.areSourceColorsLocked &&
+                !color.alpha.isEnabled
+                  ? chroma(simulatedSourceColorHex)
+                  : chroma(scaledColor[1] as Channel)
+              ).rgb()
+              return rgbToCmyk(r, g, b)
+            })(),
             alpha: color.alpha.isEnabled
               ? parseFloat(((scaledColor[0][1] as number) / 100).toFixed(2))
               : undefined,

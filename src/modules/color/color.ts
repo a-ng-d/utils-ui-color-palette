@@ -61,6 +61,37 @@ const applyColorMatrix = (color: Channel, matrix: number[][]): Channel => {
   ]
 }
 
+const rgbToCmyk = (
+  r: number,
+  g: number,
+  b: number
+): [number, number, number, number] => {
+  const r1 = r / 255,
+    g1 = g / 255,
+    b1 = b / 255
+  const k = 1 - Math.max(r1, g1, b1)
+
+  if (k === 1) return [0, 0, 0, 1]
+
+  return [
+    (1 - r1 - k) / (1 - k),
+    (1 - g1 - k) / (1 - k),
+    (1 - b1 - k) / (1 - k),
+    k,
+  ]
+}
+
+const cmykToRgb = (
+  c: number,
+  m: number,
+  y: number,
+  k: number
+): Channel => [
+  Math.round(255 * (1 - c) * (1 - k)),
+  Math.round(255 * (1 - m) * (1 - k)),
+  Math.round(255 * (1 - y) * (1 - k)),
+]
+
 export default class Color {
   private render: 'HEX' | 'RGB'
   private sourceColor: Channel
@@ -436,6 +467,105 @@ export default class Color {
       hsluv.rgb_g * 255,
       hsluv.rgb_b * 255,
     ]
+
+    if (this.render === 'HEX')
+      return chroma
+        .rgb(...this.simulateColorBlindRgb(newColor), this.alpha)
+        .hex()
+
+    return [...this.simulateColorBlindRgb(newColor), this.alpha]
+  }
+
+  hsv = (): ColorFormat<typeof this.render> => {
+    const hsv = chroma(this.sourceColor).hsv(),
+      newColor = chroma
+        .hsv(
+          this.adjustHue(Number.isNaN(hsv[0]) ? 0 : hsv[0]),
+          this.adjustChroma(hsv[1] * (this.chromaShifting / 100)),
+          this.lightness / 100
+        )
+        .rgb()
+
+    if (this.render === 'HEX') return this.simulateColorBlindHex(newColor)
+
+    return this.simulateColorBlindRgb(newColor)
+  }
+
+  hsva = (): ColorFormat<typeof this.render> => {
+    const hsv = chroma(this.sourceColor).hsv(),
+      newColor = chroma
+        .hsv(
+          this.adjustHue(Number.isNaN(hsv[0]) ? 0 : hsv[0]),
+          this.adjustChroma(hsv[1] * (this.chromaShifting / 100)),
+          hsv[2]
+        )
+        .rgb()
+
+    if (this.render === 'HEX')
+      return chroma
+        .rgb(...this.simulateColorBlindRgb(newColor), this.alpha)
+        .hex()
+
+    return [...this.simulateColorBlindRgb(newColor), this.alpha]
+  }
+
+  cmyk = (): ColorFormat<typeof this.render> => {
+    const hsl = chroma(this.sourceColor).hsl()
+    const [r, g, b] = chroma
+      .hsl(
+        this.adjustHue(Number.isNaN(hsl[0]) ? 0 : hsl[0]),
+        hsl[1],
+        hsl[2]
+      )
+      .rgb()
+
+    const [c, m, y] = rgbToCmyk(r, g, b)
+    const adjustedC = Math.min(
+      1,
+      Math.max(0, this.adjustChroma(c * (this.chromaShifting / 100)))
+    )
+    const adjustedM = Math.min(
+      1,
+      Math.max(0, this.adjustChroma(m * (this.chromaShifting / 100)))
+    )
+    const adjustedY = Math.min(
+      1,
+      Math.max(0, this.adjustChroma(y * (this.chromaShifting / 100)))
+    )
+    const adjustedK = Math.min(1, Math.max(0, 1 - this.lightness / 100))
+
+    const newColor = cmykToRgb(adjustedC, adjustedM, adjustedY, adjustedK)
+
+    if (this.render === 'HEX') return this.simulateColorBlindHex(newColor)
+
+    return this.simulateColorBlindRgb(newColor)
+  }
+
+  cmyka = (): ColorFormat<typeof this.render> => {
+    const hsl = chroma(this.sourceColor).hsl()
+    const [r, g, b] = chroma
+      .hsl(
+        this.adjustHue(Number.isNaN(hsl[0]) ? 0 : hsl[0]),
+        hsl[1],
+        hsl[2]
+      )
+      .rgb()
+
+    const [c, m, y, k] = rgbToCmyk(r, g, b)
+    const adjustedC = Math.min(
+      1,
+      Math.max(0, this.adjustChroma(c * (this.chromaShifting / 100)))
+    )
+    const adjustedM = Math.min(
+      1,
+      Math.max(0, this.adjustChroma(m * (this.chromaShifting / 100)))
+    )
+    const adjustedY = Math.min(
+      1,
+      Math.max(0, this.adjustChroma(y * (this.chromaShifting / 100)))
+    )
+
+    const newColor = cmykToRgb(adjustedC, adjustedM, adjustedY, k)
 
     if (this.render === 'HEX')
       return chroma

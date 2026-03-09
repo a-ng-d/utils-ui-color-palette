@@ -54,6 +54,8 @@ describe('Color', () => {
     expect(color.oklab()).toBeDefined()
     expect(color.hsl()).toBeDefined()
     expect(color.hsluv()).toBeDefined()
+    expect(color.hsv()).toBeDefined()
+    expect(color.cmyk()).toBeDefined()
   })
 
   it('should correctly handle alpha channel', () => {
@@ -113,6 +115,8 @@ describe('Color', () => {
     'oklaba',
     'hsla',
     'hsluva',
+    'hsva',
+    'cmyka',
   ] as const
 
   colorSpaceMethods.forEach((method) => {
@@ -165,7 +169,7 @@ describe('Color', () => {
     const result = color.setColor()
     expect(result).toBeDefined()
 
-    const methods = ['lch', 'oklch', 'lab', 'oklab', 'hsl', 'hsluv']
+    const methods = ['lch', 'oklch', 'lab', 'oklab', 'hsl', 'hsluv', 'hsv', 'cmyk']
     methods.forEach((method) => {
       expect(color[method as keyof Color]).toBeDefined()
     })
@@ -198,12 +202,16 @@ describe('Color', () => {
       'oklab',
       'hsl',
       'hsluv',
+      'hsv',
+      'cmyk',
       'lcha',
       'oklcha',
       'laba',
       'oklaba',
       'hsla',
       'hsluva',
+      'hsva',
+      'cmyka',
     ]
     const color = new Color({ sourceColor })
 
@@ -235,6 +243,175 @@ describe('Color', () => {
 
     extremeCases.forEach(([colorA, colorB]) => {
       expect(color.mixColorsRgb(colorA, colorB)).toBeDefined()
+    })
+  })
+
+  // HSV
+  it('should return a HEX string from hsv', () => {
+    const color = new Color({ sourceColor })
+    const result = color.hsv() as string
+
+    expect(typeof result).toBe('string')
+    expect(result.startsWith('#')).toBe(true)
+  })
+
+  it('should return a 3-element RGB array from hsv', () => {
+    const color = new Color({ sourceColor, render: 'RGB' })
+    const result = color.hsv() as number[]
+
+    expect(result.length).toBe(3)
+    result.forEach((c) => expect(c).toBeGreaterThanOrEqual(0))
+    result.forEach((c) => expect(c).toBeLessThanOrEqual(255))
+  })
+
+  it('should produce different outputs for different lightness in HSV', () => {
+    const dark = new Color({ sourceColor, lightness: 10 })
+    const bright = new Color({ sourceColor, lightness: 90 })
+
+    expect(dark.hsv()).not.toEqual(bright.hsv())
+  })
+
+  it('should produce different outputs for different chromaShifting in HSV', () => {
+    const full = new Color({ sourceColor, chromaShifting: 100 })
+    const low = new Color({ sourceColor, chromaShifting: 20 })
+
+    expect(full.hsv()).not.toEqual(low.hsv())
+  })
+
+  it('should produce different outputs for different hueShifting in HSV', () => {
+    const base = new Color({ sourceColor })
+    const shifted = new Color({ sourceColor, hueShifting: 90 })
+
+    expect(base.hsv()).not.toEqual(shifted.hsv())
+  })
+
+  it('should return a 4-element array for hsva with render RGB', () => {
+    const color = new Color({ sourceColor, render: 'RGB', alpha: 0.5 })
+    const result = color.hsva() as number[]
+
+    expect(result.length).toBe(4)
+    expect(result[3]).toBeCloseTo(0.5, 5)
+  })
+
+  it('should return a HEX string with alpha for hsva', () => {
+    const color = new Color({ sourceColor, render: 'HEX', alpha: 0.5 })
+    const result = color.hsva() as string
+
+    expect(result.startsWith('#')).toBe(true)
+  })
+
+  it('should preserve original V in hsva (no lightness override)', () => {
+    const base = new Color({ sourceColor, render: 'RGB' })
+    const withLightness = new Color({
+      sourceColor,
+      render: 'RGB',
+      lightness: 10,
+    })
+
+    expect(base.hsva()).not.toEqual(withLightness.hsv())
+  })
+
+  it('should handle achromatic colors in HSV without errors', () => {
+    const black = new Color({ sourceColor: [0, 0, 0] })
+    const white = new Color({ sourceColor: [255, 255, 255] })
+    const gray = new Color({ sourceColor: [128, 128, 128] })
+
+    expect(black.hsv()).toBeDefined()
+    expect(white.hsv()).toBeDefined()
+    expect(gray.hsv()).toBeDefined()
+  })
+
+  // CMYK
+  it('should return a HEX string from cmyk', () => {
+    const color = new Color({ sourceColor })
+    const result = color.cmyk() as string
+
+    expect(typeof result).toBe('string')
+    expect(result.startsWith('#')).toBe(true)
+  })
+
+  it('should return a 3-element RGB array from cmyk', () => {
+    const color = new Color({ sourceColor, render: 'RGB' })
+    const result = color.cmyk() as number[]
+
+    expect(result.length).toBe(3)
+    result.forEach((c) => expect(c).toBeGreaterThanOrEqual(0))
+    result.forEach((c) => expect(c).toBeLessThanOrEqual(255))
+  })
+
+  it('should produce different outputs for different lightness in CMYK', () => {
+    const dark = new Color({ sourceColor, lightness: 10 })
+    const bright = new Color({ sourceColor, lightness: 90 })
+
+    expect(dark.cmyk()).not.toEqual(bright.cmyk())
+  })
+
+  it('should produce different outputs for different chromaShifting in CMYK', () => {
+    const full = new Color({ sourceColor, chromaShifting: 100 })
+    const low = new Color({ sourceColor, chromaShifting: 20 })
+
+    expect(full.cmyk()).not.toEqual(low.cmyk())
+  })
+
+  it('should produce different outputs for different hueShifting in CMYK', () => {
+    const base = new Color({ sourceColor, lightness: 50 })
+    const shifted = new Color({ sourceColor, lightness: 50, hueShifting: 90 })
+
+    expect(base.cmyk()).not.toEqual(shifted.cmyk())
+  })
+
+  it('should return a 4-element array for cmyka with render RGB', () => {
+    const color = new Color({ sourceColor, render: 'RGB', alpha: 0.5 })
+    const result = color.cmyka() as number[]
+
+    expect(result.length).toBe(4)
+    expect(result[3]).toBeCloseTo(0.5, 5)
+  })
+
+  it('should return a HEX string with alpha for cmyka', () => {
+    const color = new Color({ sourceColor, render: 'HEX', alpha: 0.5 })
+    const result = color.cmyka() as string
+
+    expect(result.startsWith('#')).toBe(true)
+  })
+
+  it('should preserve original K in cmyka (no lightness override)', () => {
+    const base = new Color({ sourceColor, render: 'RGB' })
+    const withLightness = new Color({
+      sourceColor,
+      render: 'RGB',
+      lightness: 10,
+    })
+
+    expect(base.cmyka()).not.toEqual(withLightness.cmyk())
+  })
+
+  it('should handle pure black source in CMYK', () => {
+    const color = new Color({ sourceColor: [0, 0, 0], lightness: 0 })
+
+    expect(color.cmyk()).toBeDefined()
+    expect(color.cmyka()).toBeDefined()
+  })
+
+  it('should handle pure white source in CMYK', () => {
+    const color = new Color({ sourceColor: [255, 255, 255], lightness: 100 })
+
+    expect(color.cmyk()).toBeDefined()
+    expect(color.cmyka()).toBeDefined()
+  })
+
+  it('should clamp RGB channels to [0, 255] in CMYK with extreme chromaShifting', () => {
+    const color = new Color({
+      sourceColor,
+      render: 'RGB',
+      chromaShifting: 500,
+      lightness: 50,
+    })
+    const result = color.cmyk() as number[]
+
+    result.forEach((c) => {
+      expect(c).toBeGreaterThanOrEqual(0)
+      expect(c).toBeLessThanOrEqual(255)
     })
   })
 })

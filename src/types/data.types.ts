@@ -60,6 +60,8 @@ export interface PaletteDataShadeItem {
   oklab: Channel
   hsl: Channel
   hsluv: Channel
+  hsv: Channel
+  cmyk: ChannelWithAlpha
   alpha?: number
   backgroundColor?: Channel
   mixedColor?: Channel
