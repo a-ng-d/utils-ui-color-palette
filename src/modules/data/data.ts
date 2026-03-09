@@ -64,6 +64,7 @@ export default class Data {
         name: theme.name,
         description: theme.description,
         colors: [],
+        textColorsTheme: theme.textColorsTheme,
         type: theme.type,
       }
       this.base.colors.forEach((color) => {

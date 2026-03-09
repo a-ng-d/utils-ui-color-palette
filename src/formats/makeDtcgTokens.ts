@@ -1,5 +1,9 @@
 import { PaletteData, PaletteDataShadeItem } from '@tps/data.types'
-import { ColorSpaceConfiguration } from '@tps/configuration.types'
+import {
+  ColorSpaceConfiguration,
+  TextColorsThemeConfiguration,
+} from '@tps/configuration.types'
+import Contrast from '../modules/contrast/contrast'
 
 const makeDtcgTokens = (
   paletteData: PaletteData,
@@ -80,6 +84,45 @@ const makeDtcgTokens = (
     return actions[colorSpace ?? 'RGB']?.()
   }
 
+  const makeContrastExtensions = (
+    shade: PaletteDataShadeItem,
+    textColorsTheme: TextColorsThemeConfiguration<'HEX'>
+  ) => {
+    const bgColor =
+      shade.isTransparent && shade.mixedColor ? shade.mixedColor : shade.rgb
+    const lightContrast = new Contrast({
+      backgroundColor: bgColor,
+      textColor: textColorsTheme.lightColor,
+    })
+    const darkContrast = new Contrast({
+      backgroundColor: bgColor,
+      textColor: textColorsTheme.darkColor,
+    })
+
+    return {
+      wcag: {
+        light: {
+          score: lightContrast.getWCAGScore(),
+          ratio: parseFloat(lightContrast.getWCAGContrast().toFixed(2)),
+        },
+        dark: {
+          score: darkContrast.getWCAGScore(),
+          ratio: parseFloat(darkContrast.getWCAGContrast().toFixed(2)),
+        },
+      },
+      apca: {
+        light: {
+          score: parseFloat(lightContrast.getAPCAContrast().toFixed(2)),
+          recommendation: lightContrast.getRecommendedUsage(),
+        },
+        dark: {
+          score: parseFloat(darkContrast.getAPCAContrast().toFixed(2)),
+          recommendation: darkContrast.getRecommendedUsage(),
+        },
+      },
+    }
+  }
+
   if (workingThemes[0].type === 'custom theme')
     workingThemes.forEach((theme) => {
       theme.colors.forEach((color) => {
@@ -105,13 +148,28 @@ const makeDtcgTokens = (
                   : shade.description,
               $extensions: {
                 mode: {},
+                'com.uicp.wcag': {},
+                'com.uicp.apca': {},
               },
             }
-          if (source)
+          if (source) {
             json[color.name][shade.name].$extensions.mode[theme.name] =
               shade.isTransparent
                 ? setValueAccordingToColorSpaceAndAlpha(source, shade)
                 : setValueAccordingToColorSpace(shade)
+            if (theme.textColorsTheme) {
+              const contrastData = makeContrastExtensions(
+                shade,
+                theme.textColorsTheme
+              )
+              json[color.name][shade.name].$extensions['com.uicp.wcag'][
+                theme.name
+              ] = contrastData.wcag
+              json[color.name][shade.name].$extensions['com.uicp.apca'][
+                theme.name
+              ] = contrastData.apca
+            }
+          }
         })
       })
     })
@@ -124,7 +182,11 @@ const makeDtcgTokens = (
 
         json[color.name] = {}
         color.shades.forEach((shade) => {
-          if (shade && source)
+          if (shade && source) {
+            const contrastData = theme.textColorsTheme
+              ? makeContrastExtensions(shade, theme.textColorsTheme)
+              : undefined
+
             json[color.name][shade.name] = {
               $type: 'color',
               $value: shade.isTransparent
@@ -134,7 +196,14 @@ const makeDtcgTokens = (
                 color.description !== ''
                   ? color.description + ' - ' + shade.description
                   : shade.description,
+              ...(contrastData && {
+                $extensions: {
+                  'com.uicp.wcag': contrastData.wcag,
+                  'com.uicp.apca': contrastData.apca,
+                },
+              }),
             }
+          }
         })
       })
     })

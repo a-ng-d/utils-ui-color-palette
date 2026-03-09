@@ -5,6 +5,7 @@ import {
   LockedSourceColorsConfiguration,
   PresetConfiguration,
   ShiftConfiguration,
+  TextColorsThemeConfiguration,
   ThemeConfiguration,
 } from './configuration.types'
 import { Channel, ChannelWithAlpha, HexModel } from './color.types'
@@ -37,6 +38,7 @@ export interface PaletteDataThemeItem {
   name: string
   description: string
   colors: Array<PaletteDataColorItem>
+  textColorsTheme?: TextColorsThemeConfiguration<'HEX'>
   type: 'default theme' | 'custom theme'
 }
 
