@@ -551,6 +551,239 @@ describe('Code', () => {
     })
   })
 
+  describe('makeLibraryData options', () => {
+    it('should include hex field when hex option is provided', () => {
+      const data = new Data({
+        base: mockBase,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+
+      const result = data.makeLibraryData(['hex'])
+
+      result.forEach((item) => {
+        expect(item.hex).toBeDefined()
+        expect(typeof item.hex).toBe('string')
+        expect(item.hex).toMatch(/^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/)
+      })
+    })
+
+    it('should include gl field when gl option is provided', () => {
+      const data = new Data({
+        base: mockBase,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+
+      const result = data.makeLibraryData(['gl'])
+
+      result.forEach((item) => {
+        expect(item.gl).toBeDefined()
+        expect(Array.isArray(item.gl)).toBe(true)
+      })
+    })
+
+    it('should include description field when description option is provided', () => {
+      const data = new Data({
+        base: mockBase,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+
+      const result = data.makeLibraryData(['description'])
+
+      result.forEach((item) => {
+        expect(item.description).toBeDefined()
+      })
+    })
+
+    it('should include alpha field when alpha option is provided', () => {
+      const baseWithAlpha: BaseConfiguration = {
+        ...mockBase,
+        colors: [
+          {
+            ...mockBase.colors[2],
+          },
+        ],
+      }
+      const data = new Data({
+        base: baseWithAlpha,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+
+      const result = data.makeLibraryData(['alpha'])
+
+      const nonSourceShades = result.filter(
+        (item) => item.shadeName !== 'source'
+      )
+      nonSourceShades.forEach((item) => {
+        expect(item.alpha).toBeDefined()
+        expect(item.alpha).toBeGreaterThanOrEqual(0)
+        expect(item.alpha).toBeLessThanOrEqual(1)
+      })
+    })
+
+    it('should not include hex field when hex option is not provided', () => {
+      const data = new Data({
+        base: mockBase,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+
+      const result = data.makeLibraryData()
+
+      result.forEach((item) => {
+        expect(item.hex).toBeUndefined()
+      })
+    })
+
+    it('should retrieve catalogId from previousData when catalog_id option is provided', () => {
+      const data = new Data({
+        base: mockBase,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+
+      const initialLibraryData = data.makeLibraryData()
+      const firstShade = initialLibraryData[0]
+      const previousData = [
+        {
+          ...firstShade,
+          catalogId: 'catalog-001',
+        },
+      ]
+
+      const result = data.makeLibraryData(['catalog_id'], previousData)
+
+      const found = result.find((item) => item.id === firstShade.id)
+      expect(found?.catalogId).toBe('catalog-001')
+    })
+
+    it('should retrieve themeId from previousData when theme_id option is provided', () => {
+      const data = new Data({
+        base: mockBase,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+
+      const initialLibraryData = data.makeLibraryData()
+      const firstShade = initialLibraryData[0]
+      const previousData = [
+        {
+          ...firstShade,
+          themeId: 'theme-001',
+        },
+      ]
+
+      const result = data.makeLibraryData(['theme_id'], previousData)
+
+      const found = result.find((item) => item.id === firstShade.id)
+      expect(found?.themeId).toBe('theme-001')
+    })
+
+    it('should retrieve setId from previousData when set_id option is provided', () => {
+      const data = new Data({
+        base: mockBase,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+
+      const initialLibraryData = data.makeLibraryData()
+      const firstShade = initialLibraryData[0]
+      const previousData = [
+        {
+          ...firstShade,
+          setId: 'set-001',
+        },
+      ]
+
+      const result = data.makeLibraryData(['set_id'], previousData)
+
+      const found = result.find((item) => item.id === firstShade.id)
+      expect(found?.setId).toBe('set-001')
+    })
+
+    it('should retrieve tokenId from previousData when token_id option is provided', () => {
+      const data = new Data({
+        base: mockBase,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+
+      const initialLibraryData = data.makeLibraryData()
+      const firstShade = initialLibraryData[0]
+      const previousData = [
+        {
+          ...firstShade,
+          tokenId: 'token-001',
+        },
+      ]
+
+      const result = data.makeLibraryData(['token_id'], previousData)
+
+      const found = result.find((item) => item.id === firstShade.id)
+      expect(found?.tokenId).toBe('token-001')
+    })
+
+    it('should generate correct id format (themeId:colorId:shadeName)', () => {
+      const data = new Data({
+        base: mockBase,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+
+      const result = data.makeLibraryData()
+
+      result.forEach((item) => {
+        const parts = item.id.split(':')
+        expect(parts).toHaveLength(3)
+        expect(parts[0]).toBe(mockTheme.id)
+      })
+    })
+
+    it('should include correct paletteName, themeName, colorName, shadeName fields', () => {
+      const data = new Data({
+        base: {
+          ...mockBase,
+          colors: [mockBase.colors[0]],
+        },
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+
+      const result = data.makeLibraryData()
+
+      const nonSourceItem = result.find((item) => item.shadeName !== 'source')
+      expect(nonSourceItem?.paletteName).toBe('Test Palette')
+      expect(nonSourceItem?.themeName).toBe('Test Theme')
+      expect(nonSourceItem?.colorName).toBe('Test Color A')
+      expect(['100', '50']).toContain(nonSourceItem?.shadeName)
+    })
+
+    it('should return undefined IDs when no previousData is provided', () => {
+      const data = new Data({
+        base: mockBase,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+
+      const result = data.makeLibraryData([
+        'style_id',
+        'variable_id',
+        'collection_id',
+        'mode_id',
+      ])
+
+      result.forEach((item) => {
+        expect(item.styleId).toBeUndefined()
+        expect(item.variableId).toBeUndefined()
+        expect(item.collectionId).toBeUndefined()
+        expect(item.modeId).toBeUndefined()
+      })
+    })
+  })
+
   describe('Library Data ID Preservation with Multiple Themes', () => {
     it('should preserve variableId and styleId across multiple themes', () => {
       const data = new Data({

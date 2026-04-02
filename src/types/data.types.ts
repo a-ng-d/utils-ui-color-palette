@@ -31,6 +31,10 @@ export interface LibraryData {
   modeId?: string
   variableId?: string
   styleId?: string
+  catalogId?: string
+  themeId?: string
+  setId?: string
+  tokenId?: string
 }
 
 export interface PaletteDataThemeItem {
