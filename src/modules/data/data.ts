@@ -434,6 +434,10 @@ export default class Data {
       | 'mode_id'
       | 'variable_id'
       | 'style_id'
+      | 'catalog_id'
+      | 'theme_id'
+      | 'set_id'
+      | 'token_id'
       | 'gl'
       | 'hex'
       | 'description'
@@ -475,6 +479,18 @@ export default class Data {
               }),
               ...(options?.includes('style_id') && {
                 styleId: previousItem?.styleId,
+              }),
+              ...(options?.includes('catalog_id') && {
+                catalogId: previousItem?.catalogId,
+              }),
+              ...(options?.includes('theme_id') && {
+                themeId: previousItem?.themeId,
+              }),
+              ...(options?.includes('set_id') && {
+                setId: previousItem?.setId,
+              }),
+              ...(options?.includes('token_id') && {
+                tokenId: previousItem?.tokenId,
               }),
             }
           })
