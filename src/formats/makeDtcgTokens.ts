@@ -1,9 +1,5 @@
 import { PaletteData, PaletteDataShadeItem } from '@tps/data.types'
-import {
-  ColorSpaceConfiguration,
-  TextColorsThemeConfiguration,
-} from '@tps/configuration.types'
-import Contrast from '../modules/contrast/contrast'
+import { ColorSpaceConfiguration } from '@tps/configuration.types'
 
 const makeDtcgTokens = (
   paletteData: PaletteData,
@@ -84,45 +80,6 @@ const makeDtcgTokens = (
     return actions[colorSpace ?? 'RGB']?.()
   }
 
-  const makeContrastExtensions = (
-    shade: PaletteDataShadeItem,
-    textColorsTheme: TextColorsThemeConfiguration<'HEX'>
-  ) => {
-    const bgColor =
-      shade.isTransparent && shade.mixedColor ? shade.mixedColor : shade.rgb
-    const lightContrast = new Contrast({
-      backgroundColor: bgColor,
-      textColor: textColorsTheme.lightColor,
-    })
-    const darkContrast = new Contrast({
-      backgroundColor: bgColor,
-      textColor: textColorsTheme.darkColor,
-    })
-
-    return {
-      wcag: {
-        light: {
-          score: lightContrast.getWCAGScore(),
-          ratio: parseFloat(lightContrast.getWCAGContrast().toFixed(2)),
-        },
-        dark: {
-          score: darkContrast.getWCAGScore(),
-          ratio: parseFloat(darkContrast.getWCAGContrast().toFixed(2)),
-        },
-      },
-      apca: {
-        light: {
-          score: parseFloat(lightContrast.getAPCAContrast().toFixed(2)),
-          recommendation: lightContrast.getRecommendedUsage(),
-        },
-        dark: {
-          score: parseFloat(darkContrast.getAPCAContrast().toFixed(2)),
-          recommendation: darkContrast.getRecommendedUsage(),
-        },
-      },
-    }
-  }
-
   if (workingThemes[0].type === 'custom theme')
     workingThemes.forEach((theme) => {
       theme.colors.forEach((color) => {
@@ -157,17 +114,32 @@ const makeDtcgTokens = (
               shade.isTransparent
                 ? setValueAccordingToColorSpaceAndAlpha(source, shade)
                 : setValueAccordingToColorSpace(shade)
-            if (theme.textColorsTheme) {
-              const contrastData = makeContrastExtensions(
-                shade,
-                theme.textColorsTheme
-              )
+            if (shade.textContrast) {
               json[color.name][shade.name].$extensions['com.uicp.wcag'][
                 theme.name
-              ] = contrastData.wcag
+              ] = {
+                light: {
+                  score: shade.textContrast.wcag.light.score,
+                  ratio: shade.textContrast.wcag.light.ratio,
+                },
+                dark: {
+                  score: shade.textContrast.wcag.dark.score,
+                  ratio: shade.textContrast.wcag.dark.ratio,
+                },
+              }
               json[color.name][shade.name].$extensions['com.uicp.apca'][
                 theme.name
-              ] = contrastData.apca
+              ] = {
+                light: {
+                  score: shade.textContrast.apca.light.lc,
+                  recommendation:
+                    shade.textContrast.apca.light.recommendedUsage,
+                },
+                dark: {
+                  score: shade.textContrast.apca.dark.lc,
+                  recommendation: shade.textContrast.apca.dark.recommendedUsage,
+                },
+              }
             }
           }
         })
@@ -183,10 +155,6 @@ const makeDtcgTokens = (
         json[color.name] = {}
         color.shades.forEach((shade) => {
           if (shade && source) {
-            const contrastData = theme.textColorsTheme
-              ? makeContrastExtensions(shade, theme.textColorsTheme)
-              : undefined
-
             json[color.name][shade.name] = {
               $type: 'color',
               $value: shade.isTransparent
@@ -196,10 +164,30 @@ const makeDtcgTokens = (
                 color.description !== ''
                   ? color.description + ' - ' + shade.description
                   : shade.description,
-              ...(contrastData && {
+              ...(shade.textContrast && {
                 $extensions: {
-                  'com.uicp.wcag': contrastData.wcag,
-                  'com.uicp.apca': contrastData.apca,
+                  'com.uicp.wcag': {
+                    light: {
+                      score: shade.textContrast.wcag.light.score,
+                      ratio: shade.textContrast.wcag.light.ratio,
+                    },
+                    dark: {
+                      score: shade.textContrast.wcag.dark.score,
+                      ratio: shade.textContrast.wcag.dark.ratio,
+                    },
+                  },
+                  'com.uicp.apca': {
+                    light: {
+                      score: shade.textContrast.apca.light.lc,
+                      recommendation:
+                        shade.textContrast.apca.light.recommendedUsage,
+                    },
+                    dark: {
+                      score: shade.textContrast.apca.dark.lc,
+                      recommendation:
+                        shade.textContrast.apca.dark.recommendedUsage,
+                    },
+                  },
                 },
               }),
             }

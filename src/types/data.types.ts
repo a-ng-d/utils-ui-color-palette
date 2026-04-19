@@ -71,6 +71,62 @@ export interface PaletteDataShadeItem {
   alpha?: number
   backgroundColor?: Channel
   mixedColor?: Channel
+  contrast: {
+    wcag: {
+      ratio: number
+      score: 'A' | 'AA' | 'AAA'
+    }
+    apca: {
+      lc: number
+      recommendedUsage:
+        | 'UNKNOWN'
+        | 'AVOID'
+        | 'NON_TEXT'
+        | 'SPOT_TEXT'
+        | 'HEADLINES'
+        | 'BODY_TEXT'
+        | 'CONTENT_TEXT'
+        | 'FLUENT_TEXT'
+    }
+  }
+  textContrast?: {
+    wcag: {
+      light: {
+        ratio: number
+        score: 'A' | 'AA' | 'AAA'
+      }
+      dark: {
+        ratio: number
+        score: 'A' | 'AA' | 'AAA'
+      }
+    }
+    apca: {
+      light: {
+        lc: number
+        recommendedUsage:
+          | 'UNKNOWN'
+          | 'AVOID'
+          | 'NON_TEXT'
+          | 'SPOT_TEXT'
+          | 'HEADLINES'
+          | 'BODY_TEXT'
+          | 'CONTENT_TEXT'
+          | 'FLUENT_TEXT'
+      }
+      dark: {
+        lc: number
+        recommendedUsage:
+          | 'UNKNOWN'
+          | 'AVOID'
+          | 'NON_TEXT'
+          | 'SPOT_TEXT'
+          | 'HEADLINES'
+          | 'BODY_TEXT'
+          | 'CONTENT_TEXT'
+          | 'FLUENT_TEXT'
+      }
+    }
+  }
   isClosestToRef?: boolean
   isSourceColorLocked?: boolean
   isTransparent?: boolean
