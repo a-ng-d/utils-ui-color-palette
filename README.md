@@ -20,6 +20,7 @@ UI Color Palette is available for:
   - APCA contrast calculations
   - WCAG 2.1 compliance checking
   - Contrast ratio calculations between colors
+  - Pre-computed text contrast scores (light/dark) per shade
 
 - **Color Manipulation**:
 
@@ -304,6 +305,19 @@ const data = new Data(config)
 // Generate palette data
 const paletteData = data.makePaletteData()
 const fullData = data.makePaletteFullData()
+
+// Access pre-computed text contrast scores
+paletteData.themes[0].colors[0].shades.forEach((shade) => {
+  if (shade.textContrast) {
+    // WCAG scores for light/dark text on this shade
+    console.log(shade.textContrast.wcag.light) // { ratio: 4.5, score: 'AA' }
+    console.log(shade.textContrast.wcag.dark) // { ratio: 12.6, score: 'AAA' }
+
+    // APCA scores for light/dark text on this shade
+    console.log(shade.textContrast.apca.light) // { lc: -60.2, recommendedUsage: 'BODY_TEXT' }
+    console.log(shade.textContrast.apca.dark) // { lc: 85.1, recommendedUsage: 'FLUENT_TEXT' }
+  }
+})
 ```
 
 ## Testing
@@ -320,13 +334,13 @@ Current test coverage results:
 
 | File              | % Stmts | % Branch | % Funcs | % Lines |
 | ----------------- | ------- | -------- | ------- | ------- |
-| **All files**     | **94.29** | **85.63** | **92.3** | **94.29** |
+| **All files**     | **91.61** | **87.27** | **91.59** | **91.61** |
 | code              | 100     | 100      | 100     | 100     |
-| color             | 92.06   | 72.38    | 80.95   | 92.06   |
-| color-harmony     | 100     | 96.42    | 100     | 100     |
-| contrast          | 89      | 93.02    | 100     | 89      |
-| data              | 92.69   | 84.74    | 100     | 92.69   |
-| dominant-colors   | 100     | 100      | 100     | 100     |
+| color             | 93.54   | 77.51    | 83.33   | 93.54   |
+| color-harmony     | 100     | 96.66    | 100     | 100     |
+| contrast          | 89      | 93.33    | 100     | 89      |
+| data              | 93.48   | 89.74    | 100     | 93.48   |
+| dominant-colors   | 77.58   | 89.06    | 90.47   | 77.58   |
 
 To run coverage tests:
 
