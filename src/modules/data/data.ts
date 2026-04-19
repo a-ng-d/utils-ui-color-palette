@@ -13,6 +13,7 @@ import {
   FullConfiguration,
 } from '@tps/configuration.types'
 import { Channel, ChannelWithAlpha, HexModel } from '@tps/color.types'
+import Contrast from '@modules/contrast/contrast'
 import Color from '@modules/color/color'
 
 const rgbToCmyk = (r: number, g: number, b: number): ChannelWithAlpha => {
@@ -252,6 +253,49 @@ export default class Data {
         sourceHsluv.rgb_g = color.rgb.g
         sourceHsluv.rgb_b = color.rgb.b
         sourceHsluv.rgbToHsluv()
+        const sourceContrastChecker = new Contrast({
+          backgroundColor: sourceColor,
+          textColor: theme.paletteBackground,
+        })
+
+        const sourceTextContrast = theme.textColorsTheme
+          ? (() => {
+              const lightContrast = new Contrast({
+                backgroundColor: sourceColor,
+                textColor: theme.textColorsTheme.lightColor,
+              })
+              const darkContrast = new Contrast({
+                backgroundColor: sourceColor,
+                textColor: theme.textColorsTheme.darkColor,
+              })
+              return {
+                wcag: {
+                  light: {
+                    ratio: parseFloat(
+                      lightContrast.getWCAGContrast().toFixed(2)
+                    ),
+                    score: lightContrast.getWCAGScore(),
+                  },
+                  dark: {
+                    ratio: parseFloat(
+                      darkContrast.getWCAGContrast().toFixed(2)
+                    ),
+                    score: darkContrast.getWCAGScore(),
+                  },
+                },
+                apca: {
+                  light: {
+                    lc: parseFloat(lightContrast.getAPCAContrast().toFixed(2)),
+                    recommendedUsage: lightContrast.getRecommendedUsage(),
+                  },
+                  dark: {
+                    lc: parseFloat(darkContrast.getAPCAContrast().toFixed(2)),
+                    recommendedUsage: darkContrast.getRecommendedUsage(),
+                  },
+                },
+              }
+            })()
+          : undefined
 
         paletteDataColorItem.shades.push({
           name: 'source',
@@ -271,6 +315,17 @@ export default class Data {
           ],
           hsv: chroma(sourceColor).hsv() as Channel,
           cmyk: rgbToCmyk(...sourceColor),
+          contrast: {
+            wcag: {
+              ratio: sourceContrastChecker.getWCAGContrast(),
+              score: sourceContrastChecker.getWCAGScore(),
+            },
+            apca: {
+              lc: sourceContrastChecker.getAPCAContrast(),
+              recommendedUsage: sourceContrastChecker.getRecommendedUsage(),
+            },
+          },
+          textContrast: sourceTextContrast,
           type: 'source color',
         })
 
@@ -303,6 +358,20 @@ export default class Data {
             sourceColor: chroma(sourceColor).rgb(),
             visionSimulationMode: theme.visionSimulationMode,
           }).setColor() as HexModel
+          const mixedColor =
+            color.alpha.isEnabled && color.alpha.backgroundColor
+              ? new Color({
+                  visionSimulationMode: theme.visionSimulationMode,
+                }).mixColorsRgb(
+                  [
+                    ...(scaledColor[1] as Channel),
+                    parseFloat(
+                      ((scaledColor[0][1] as number) / 100).toFixed(2)
+                    ),
+                  ],
+                  [...(scaledColor[2] as Channel), 1]
+                )
+              : undefined
 
           if (
             index === minDistanceIndex &&
@@ -319,11 +388,66 @@ export default class Data {
           }
           newHsluv.rgbToHsluv()
 
+          const contrastChecker = new Contrast({
+            backgroundColor: color.alpha.isEnabled
+              ? mixedColor
+              : (scaledColor[1] as Channel),
+            textColor: theme.paletteBackground,
+          })
+          const wcagRatio = contrastChecker.getWCAGContrast()
+          const wcagScore = contrastChecker.getWCAGScore()
+          const apcaLc = contrastChecker.getAPCAContrast()
+          const apcaUsage = contrastChecker.getRecommendedUsage()
+
+          const shadeTextContrast = theme.textColorsTheme
+            ? (() => {
+                const bgColor = color.alpha.isEnabled
+                  ? mixedColor
+                  : (scaledColor[1] as Channel)
+                const lightContrast = new Contrast({
+                  backgroundColor: bgColor,
+                  textColor: theme.textColorsTheme.lightColor,
+                })
+                const darkContrast = new Contrast({
+                  backgroundColor: bgColor,
+                  textColor: theme.textColorsTheme.darkColor,
+                })
+                return {
+                  wcag: {
+                    light: {
+                      ratio: parseFloat(
+                        lightContrast.getWCAGContrast().toFixed(2)
+                      ),
+                      score: lightContrast.getWCAGScore(),
+                    },
+                    dark: {
+                      ratio: parseFloat(
+                        darkContrast.getWCAGContrast().toFixed(2)
+                      ),
+                      score: darkContrast.getWCAGScore(),
+                    },
+                  },
+                  apca: {
+                    light: {
+                      lc: parseFloat(
+                        lightContrast.getAPCAContrast().toFixed(2)
+                      ),
+                      recommendedUsage: lightContrast.getRecommendedUsage(),
+                    },
+                    dark: {
+                      lc: parseFloat(darkContrast.getAPCAContrast().toFixed(2)),
+                      recommendedUsage: darkContrast.getRecommendedUsage(),
+                    },
+                  },
+                }
+              })()
+            : undefined
+
           paletteDataColorItem.shades.push({
             name: scaleName,
             description: `Shade/Tint color with ${typeof scaledColor[0][1] === 'number' ? scaledColor[0][1].toFixed(1) : scaledColor[0][1]}% of ${
               color.alpha.isEnabled ? 'opacity' : 'lightness'
-            }`,
+            } — WCAG ${wcagRatio.toFixed(2)}:1 (${wcagScore}) · APCA Lc ${apcaLc.toFixed(1)} (${apcaUsage.replace(/_/g, ' ').toLowerCase()})`,
             hex:
               index === minDistanceIndex &&
               this.base.areSourceColorsLocked &&
@@ -396,20 +520,18 @@ export default class Data {
               color.alpha.isEnabled && color.alpha.backgroundColor
                 ? chroma(scaledColor[2] as Channel).rgb()
                 : undefined,
-            mixedColor:
-              color.alpha.isEnabled && color.alpha.backgroundColor
-                ? new Color({
-                    visionSimulationMode: theme.visionSimulationMode,
-                  }).mixColorsRgb(
-                    [
-                      ...(scaledColor[1] as Channel),
-                      parseFloat(
-                        ((scaledColor[0][1] as number) / 100).toFixed(2)
-                      ),
-                    ],
-                    [...(scaledColor[2] as Channel), 1]
-                  )
-                : undefined,
+            mixedColor: mixedColor,
+            contrast: {
+              wcag: {
+                ratio: wcagRatio,
+                score: wcagScore,
+              },
+              apca: {
+                lc: apcaLc,
+                recommendedUsage: apcaUsage,
+              },
+            },
+            textContrast: shadeTextContrast,
             isClosestToRef: distance < 4 && !this.base.areSourceColorsLocked,
             isSourceColorLocked:
               index === minDistanceIndex &&

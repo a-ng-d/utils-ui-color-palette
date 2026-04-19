@@ -1041,4 +1041,152 @@ describe('Code', () => {
         })
     })
   })
+
+  describe('textContrast', () => {
+    it('should include textContrast when textColorsTheme is defined', () => {
+      const data = new Data({
+        base: mockBase,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+      const result = data.makePaletteData()
+
+      result.themes[0].colors.forEach((color) => {
+        color.shades.forEach((shade) => {
+          expect(shade.textContrast).toBeDefined()
+          expect(shade.textContrast!.wcag.light).toBeDefined()
+          expect(shade.textContrast!.wcag.dark).toBeDefined()
+          expect(shade.textContrast!.apca.light).toBeDefined()
+          expect(shade.textContrast!.apca.dark).toBeDefined()
+        })
+      })
+    })
+
+    it('should have valid WCAG ratios and scores for light and dark text', () => {
+      const data = new Data({
+        base: mockBase,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+      const result = data.makePaletteData()
+
+      result.themes[0].colors[0].shades.forEach((shade) => {
+        const tc = shade.textContrast!
+        expect(tc.wcag.light.ratio).toBeGreaterThanOrEqual(1)
+        expect(tc.wcag.dark.ratio).toBeGreaterThanOrEqual(1)
+        expect(['A', 'AA', 'AAA']).toContain(tc.wcag.light.score)
+        expect(['A', 'AA', 'AAA']).toContain(tc.wcag.dark.score)
+      })
+    })
+
+    it('should have valid APCA lc values and recommendations for light and dark text', () => {
+      const data = new Data({
+        base: mockBase,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+      const result = data.makePaletteData()
+
+      const validUsages = [
+        'UNKNOWN',
+        'AVOID',
+        'NON_TEXT',
+        'SPOT_TEXT',
+        'HEADLINES',
+        'BODY_TEXT',
+        'CONTENT_TEXT',
+        'FLUENT_TEXT',
+      ]
+
+      result.themes[0].colors[0].shades.forEach((shade) => {
+        const tc = shade.textContrast!
+        expect(typeof tc.apca.light.lc).toBe('number')
+        expect(typeof tc.apca.dark.lc).toBe('number')
+        expect(validUsages).toContain(tc.apca.light.recommendedUsage)
+        expect(validUsages).toContain(tc.apca.dark.recommendedUsage)
+      })
+    })
+
+    it('should not include textContrast when textColorsTheme is undefined', () => {
+      const themeWithoutTextColors: ThemeConfiguration = {
+        ...mockTheme,
+        textColorsTheme:
+          undefined as unknown as ThemeConfiguration['textColorsTheme'],
+      }
+
+      const data = new Data({
+        base: mockBase,
+        themes: [themeWithoutTextColors],
+        meta: mockMeta,
+      })
+      const result = data.makePaletteData()
+
+      result.themes[0].colors[0].shades.forEach((shade) => {
+        expect(shade.textContrast).toBeUndefined()
+      })
+    })
+
+    it('should compute textContrast for transparent colors using mixedColor', () => {
+      const baseWithAlpha: BaseConfiguration = {
+        ...mockBase,
+        colors: [
+          {
+            ...mockBase.colors[0],
+            alpha: {
+              isEnabled: true,
+              backgroundColor: '#FFFFFF',
+            },
+          },
+        ],
+      }
+
+      const data = new Data({
+        base: baseWithAlpha,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+      const result = data.makePaletteData()
+
+      const transparentShades = result.themes[0].colors[0].shades.filter(
+        (s) => s.isTransparent
+      )
+      transparentShades.forEach((shade) => {
+        expect(shade.textContrast).toBeDefined()
+        expect(shade.textContrast!.wcag.light.ratio).toBeGreaterThanOrEqual(1)
+        expect(shade.textContrast!.wcag.dark.ratio).toBeGreaterThanOrEqual(1)
+      })
+    })
+
+    it('should compute textContrast on source color', () => {
+      const data = new Data({
+        base: mockBase,
+        themes: [mockTheme],
+        meta: mockMeta,
+      })
+      const result = data.makePaletteData()
+
+      const sourceShade = result.themes[0].colors[0].shades.find(
+        (s) => s.type === 'source color'
+      )
+      expect(sourceShade).toBeDefined()
+      expect(sourceShade!.textContrast).toBeDefined()
+      expect(sourceShade!.textContrast!.wcag.light).toBeDefined()
+      expect(sourceShade!.textContrast!.wcag.dark).toBeDefined()
+    })
+
+    it('should compute textContrast for each custom theme', () => {
+      const data = new Data({
+        base: mockBase,
+        themes: mockThemes,
+        meta: mockMeta,
+      })
+      const result = data.makePaletteData()
+
+      result.themes.forEach((theme) => {
+        theme.colors[0].shades.forEach((shade) => {
+          expect(shade.textContrast).toBeDefined()
+        })
+      })
+    })
+  })
 })
