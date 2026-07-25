@@ -1,5 +1,6 @@
+import { Case } from '@unoff/utils'
 import { SystemData } from '@tps/system.types'
-import { PaletteData } from '@tps/data.types'
+import { PaletteData, PaletteDataThemeItem } from '@tps/data.types'
 import { ColorSpaceConfiguration } from '@tps/configuration.types'
 import { CodeFile } from '@tps/code.types'
 import makeUniversalSemantics from '../../formats/semantics/makeUniversalSemantics'
@@ -16,6 +17,7 @@ import makeDtcgSemantics from '../../formats/semantics/makeDtcgSemantics'
 import makeCsvSemantics from '../../formats/semantics/makeCsvSemantics'
 import makeCssSemantics from '../../formats/semantics/makeCssSemantics'
 import makeComposeSemantics from '../../formats/semantics/makeComposeSemantics'
+import { workingThemes } from '../../formats/semantics/_helpers'
 import makeUniversalTokens from '../../formats/primitives/makeUniversalTokens'
 import makeUIKit from '../../formats/primitives/makeUIKit'
 import makeTailwindV4Config from '../../formats/primitives/makeTailwindV4Config'
@@ -30,6 +32,7 @@ import makeDtcgTokens from '../../formats/primitives/makeDtcgTokens'
 import makeCsv from '../../formats/primitives/makeCsv'
 import makeCssCustomProps from '../../formats/primitives/makeCssCustomProps'
 import makeCompose from '../../formats/primitives/makeCompose'
+import makeDtcgResolver from '../../formats/makeDtcgResolver'
 
 export default class Code {
   private paletteData: PaletteData
@@ -128,16 +131,61 @@ export default class Code {
 
   makeDtcgTokens = (
     colorSpace: ColorSpaceConfiguration = 'RGB'
-  ): Array<CodeFile> =>
-    this.wrap(
-      'primitives.json',
-      makeDtcgTokens(this.paletteData, colorSpace),
-      'application/json',
-      'semantics.json',
-      this.systemData
-        ? makeDtcgSemantics(this.paletteData, this.systemData)
-        : null
-    )
+  ): Array<CodeFile> => {
+    const themes = workingThemes(this.paletteData)
+
+    if (themes.length <= 1)
+      return this.wrap(
+        'primitives.tokens.json',
+        makeDtcgTokens(colorSpace, themes[0]),
+        'application/json',
+        'semantics.tokens.json',
+        this.systemData
+          ? makeDtcgSemantics(this.paletteData, this.systemData, themes[0])
+          : null
+      )
+
+    const files: Array<CodeFile> = []
+    const resolverInputs: Array<{
+      theme: PaletteDataThemeItem
+      primitivesFilename: string
+      semanticsFilename?: string
+    }> = []
+
+    themes.forEach((theme) => {
+      const slug = new Case(theme.name).doKebabCase()
+      const primitivesFilename = `${slug}.primitives.tokens.json`
+      files.push({
+        filename: primitivesFilename,
+        content: makeDtcgTokens(colorSpace, theme),
+        mimeType: 'application/json',
+      })
+
+      let semanticsFilename: string | undefined
+      if (this.systemData) {
+        semanticsFilename = `${slug}.semantics.tokens.json`
+        files.push({
+          filename: semanticsFilename,
+          content: makeDtcgSemantics(this.paletteData, this.systemData, theme),
+          mimeType: 'application/json',
+        })
+      }
+
+      resolverInputs.push({ theme, primitivesFilename, semanticsFilename })
+    })
+
+    files.push({
+      filename: 'tokens.resolver.json',
+      content: makeDtcgResolver(
+        this.paletteData.name,
+        this.paletteData.description,
+        resolverInputs
+      ),
+      mimeType: 'application/json',
+    })
+
+    return files
+  }
 
   makeStyleDictionaryV3Tokens = (): Array<CodeFile> =>
     this.wrap(
@@ -162,8 +210,6 @@ export default class Code {
     )
 
   makeNativeTokens = (): Array<CodeFile> => {
-    // Native Tokens (Tokens Studio) expects a single JSON with multiple sets.
-    // Both primitives and semantics live in the same file when systemData is present.
     if (!this.systemData)
       return [
         {

@@ -1,21 +1,14 @@
 import { Case } from '@unoff/utils'
 import { SystemData } from '@tps/system.types'
-import { PaletteData } from '@tps/data.types'
-import {
-  partitionTokens,
-  resolveTokenPerTheme,
-  workingThemes,
-} from './_helpers'
+import { PaletteData, PaletteDataThemeItem } from '@tps/data.types'
+import { partitionTokens, resolveTokenPerTheme } from './_helpers'
 
 const makeDtcgSemantics = (
   paletteData: PaletteData,
-  systemData: SystemData
+  systemData: SystemData,
+  theme: PaletteDataThemeItem
 ): string => {
   const { bound, unbound } = partitionTokens(paletteData, systemData)
-  const themes = workingThemes(paletteData)
-  const defaultTheme =
-    paletteData.themes.find((t) => t.type === 'default theme') ?? themes[0]
-  const customThemes = themes.filter((t) => t.type === 'custom theme')
 
   const root: Record<string, unknown> = {}
   if (unbound.length > 0)
@@ -43,37 +36,14 @@ const makeDtcgSemantics = (
   bound.forEach((t) => {
     const keys = t.pathNames.map((p) => new Case(p).doKebabCase())
     const resolved = resolveTokenPerTheme(paletteData, t)
-    const def =
-      resolved.find((r) => r.themeId === defaultTheme.id && !r.isUnbound) ??
-      resolved.find((r) => !r.isUnbound)
-    if (!def || !def.colorName || !def.shadeName) return
+    const ref = resolved.find((r) => r.themeId === theme.id && !r.isUnbound)
+    if (!ref || !ref.colorName || !ref.shadeName) return
+
     const tokenObj: Record<string, unknown> = {
       $type: 'color',
-      $value: aliasFor(def.colorName, def.shadeName),
+      $value: aliasFor(ref.colorName, ref.shadeName),
     }
     if (t.description) tokenObj.$description = t.description
-
-    const overrides: Record<string, unknown> = {}
-    customThemes.forEach((theme) => {
-      const themeRef = resolved.find((r) => r.themeId === theme.id)
-      if (
-        !themeRef ||
-        themeRef.isUnbound ||
-        !themeRef.colorName ||
-        !themeRef.shadeName
-      )
-        return
-      if (
-        def.colorName === themeRef.colorName &&
-        def.shadeName === themeRef.shadeName
-      )
-        return
-      overrides[new Case(theme.name).doKebabCase()] = {
-        $value: aliasFor(themeRef.colorName, themeRef.shadeName),
-      }
-    })
-    if (Object.keys(overrides).length > 0)
-      tokenObj.$extensions = { mode: overrides }
 
     setNested(root, keys, tokenObj)
   })

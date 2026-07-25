@@ -591,4 +591,125 @@ describe('Code with primitives', () => {
       expect(files[1].content).toContain('background/default,theme1,color1,50')
     })
   })
+
+  describe('Code with DTCG resolver (multi-theme)', () => {
+    const dataWithMultipleCustomThemes = new Data({
+      base: mockBase,
+      themes: [mockThemes[0], mockThemes[1], mockThemes[2]],
+      meta: mockMeta,
+    }).makePaletteData()
+
+    it('emits one standard primitives document per custom theme plus a resolver, with no legacy $extensions.mode', () => {
+      const codeWithCustomThemes = new Code({
+        paletteData: dataWithMultipleCustomThemes,
+      })
+      const files = codeWithCustomThemes.makeDtcgTokens('RGB')
+
+      expect(files.map((f) => f.filename)).toEqual([
+        'custom-theme-a.primitives.tokens.json',
+        'custom-theme-b.primitives.tokens.json',
+        'tokens.resolver.json',
+      ])
+
+      const [primitivesA, primitivesB, resolverFile] = files
+
+      expect(
+        JSON.parse(primitivesA.content)['Test Color A']['50'].$value
+      ).toBeDefined()
+      expect(
+        JSON.parse(primitivesB.content)['Test Color A']['50'].$value
+      ).toBeDefined()
+
+      expect(primitivesA.content).toContain('com.uicp.wcag')
+      expect(primitivesA.content).toContain('com.uicp.apca')
+      files.forEach((f) => expect(f.content).not.toContain('"mode"'))
+
+      const resolver = JSON.parse(resolverFile.content)
+      expect(resolver.version).toBe('2025.10')
+      expect(resolver.resolutionOrder).toEqual([
+        { $ref: '#/modifiers/color-mode' },
+      ])
+      expect(resolver.modifiers['color-mode'].default).toBe('custom-theme-a')
+      expect(resolver.modifiers['color-mode'].contexts).toEqual({
+        'custom-theme-a': [{ $ref: './custom-theme-a.primitives.tokens.json' }],
+        'custom-theme-b': [{ $ref: './custom-theme-b.primitives.tokens.json' }],
+      })
+    })
+
+    it('emits primitives+semantics per theme, each aliasing its own theme, plus a resolver referencing both', () => {
+      const dtcgSystemData = {
+        type: 'system' as const,
+        schema: {
+          groups: [
+            {
+              id: 'g1',
+              name: 'Type',
+              members: [{ id: 'm_bg', name: 'background' }],
+            },
+          ],
+        },
+        tokens: [
+          {
+            path: ['m_bg'],
+            pathNames: ['background'],
+            isExcluded: false,
+            refs: [
+              {
+                themeId: mockThemes[1].id,
+                shadeId: `${mockThemes[1].id}:color1:50`,
+              },
+              {
+                themeId: mockThemes[2].id,
+                shadeId: `${mockThemes[2].id}:color2:100`,
+              },
+            ],
+          },
+        ],
+      }
+
+      const codeWithCustomThemesAndSystem = new Code({
+        paletteData: dataWithMultipleCustomThemes,
+        systemData: dtcgSystemData,
+      })
+      const files = codeWithCustomThemesAndSystem.makeDtcgTokens('RGB')
+
+      expect(files.map((f) => f.filename)).toEqual([
+        'custom-theme-a.primitives.tokens.json',
+        'custom-theme-a.semantics.tokens.json',
+        'custom-theme-b.primitives.tokens.json',
+        'custom-theme-b.semantics.tokens.json',
+        'tokens.resolver.json',
+      ])
+
+      const semanticsA = JSON.parse(files[1].content)
+      expect(semanticsA.background.$value).toBe('{test-color-a.50}')
+
+      const semanticsB = JSON.parse(files[3].content)
+      expect(semanticsB.background.$value).toBe('{test-color-b.100}')
+
+      const resolver = JSON.parse(files[4].content)
+
+      expect(
+        resolver.modifiers['color-mode'].contexts['custom-theme-a']
+      ).toEqual([
+        { $ref: './custom-theme-a.primitives.tokens.json' },
+        { $ref: './custom-theme-a.semantics.tokens.json' },
+      ])
+      expect(
+        resolver.modifiers['color-mode'].contexts['custom-theme-b']
+      ).toEqual([
+        { $ref: './custom-theme-b.primitives.tokens.json' },
+        { $ref: './custom-theme-b.semantics.tokens.json' },
+      ])
+
+      files.forEach((f) => expect(f.content).not.toContain('"mode"'))
+    })
+
+    it('falls back to a single primitives file with no resolver when only one theme is active', () => {
+      const codeWithDefaultTheme = new Code({ paletteData: data })
+      const files = codeWithDefaultTheme.makeDtcgTokens('RGB')
+
+      expect(files.map((f) => f.filename)).toEqual(['primitives.tokens.json'])
+    })
+  })
 })
