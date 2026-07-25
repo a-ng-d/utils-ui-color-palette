@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.3] - 2026-07-25
+
+### Added
+
+- `makeDtcgResolver` — generates a spec-compliant DTCG resolver file (`tokens.resolver.json`) mapping each theme to its token files via a `color-mode` modifier ([designtokens.org 2025.10 resolver schema](https://www.designtokens.org/schemas/2025.10/resolver.json))
+
+### Changed
+
+- `makeDtcgTokens` output now scoped per theme for multi-theme palettes: one `{theme}.primitives.tokens.json` / `{theme}.semantics.tokens.json` pair per theme, plus the resolver file; single-theme palettes still produce a flat `primitives.tokens.json` / `semantics.tokens.json` pair
+- Removed generated `coverage/` report artifacts and related scripts from version control
+
+## [1.10.2] - 2026-07-16
+
+### Changed
+
+- Package renamed to `@yelbolt/engine-ui-color-palette`, with repository URLs updated to match
+- Migrated from `@a_ng_d/figmug-utils` to `@unoff/utils`
+- CI: Node.js version updated to 22, with an added `npm update` step
+
 ## [1.10.1] - 2026-05-08
 
 ### Added
@@ -615,7 +634,14 @@ No substantive changes — version bump only.
 - Refactor type exports in `index.ts`
 - Add type declaration for `apca-w3` module
 
-[Unreleased]: https://github.com/a-ng-d/utils-ui-color-palette/compare/v1.8.0...HEAD
+[Unreleased]: https://github.com/a-ng-d/engine-ui-color-palette/compare/v1.10.3...HEAD
+[1.10.3]: https://github.com/a-ng-d/engine-ui-color-palette/compare/v1.10.2...v1.10.3
+[1.10.2]: https://github.com/a-ng-d/engine-ui-color-palette/compare/v1.10.1...v1.10.2
+[1.10.1]: https://github.com/a-ng-d/engine-ui-color-palette/compare/v1.10.0...v1.10.1
+[1.10.0]: https://github.com/a-ng-d/engine-ui-color-palette/compare/v1.9.0...v1.10.0
+[1.9.0]: https://github.com/a-ng-d/engine-ui-color-palette/compare/v1.8.2...v1.9.0
+[1.8.2]: https://github.com/a-ng-d/engine-ui-color-palette/compare/v1.8.1...v1.8.2
+[1.8.1]: https://github.com/a-ng-d/engine-ui-color-palette/compare/v1.8.0...v1.8.1
 [1.8.0]: https://github.com/a-ng-d/utils-ui-color-palette/compare/v1.7.10...v1.8.0
 [1.7.10]: https://github.com/a-ng-d/utils-ui-color-palette/compare/v1.7.9...v1.7.10
 [1.7.9]: https://github.com/a-ng-d/utils-ui-color-palette/compare/v1.7.8...v1.7.9

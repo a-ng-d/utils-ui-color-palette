@@ -30,7 +30,6 @@ const makeCssSemantics = (
   const primitiveRef = (colorName: string, shadeName: string) =>
     `var(--${new Case(colorName).doKebabCase()}-${shadeName})`
 
-  // Default block — uses each theme's resolved value, fallback to first bound theme
   const defaultLines: Array<string> = []
   bound.forEach((t) => {
     const resolved = resolveTokenPerTheme(paletteData, t)
@@ -47,7 +46,6 @@ const makeCssSemantics = (
   out.push(...defaultLines)
   out.push('}')
 
-  // Per-theme overrides for each non-default theme
   themes
     .filter((t) => t.type === 'custom theme')
     .forEach((theme) => {
@@ -65,7 +63,6 @@ const makeCssSemantics = (
           !themeRef.shadeName
         )
           return
-        // Only emit override if it differs from the default
         if (
           defRef &&
           defRef.colorName === themeRef.colorName &&

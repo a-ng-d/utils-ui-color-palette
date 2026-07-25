@@ -8,9 +8,6 @@ import {
   workingThemes,
 } from './_helpers'
 
-// Tokens Studio requires a single JSON containing both primitive and semantic
-// token sets. This emitter parses the primitives JSON and merges a semantics
-// set in.
 const makeNativeSemantics = (
   paletteData: PaletteData,
   systemData: SystemData
@@ -49,7 +46,6 @@ const makeNativeSemantics = (
     semanticSet[keyPath] = tokenObj
   })
 
-  // Per-theme overrides → separate sets
   customThemes.forEach((theme) => {
     const themeSemanticKey = `${paletteName}/${new Case(theme.name).doSnakeCase()}-semantic`
     const themeSet: Record<string, unknown> = {}
