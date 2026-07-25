@@ -46,8 +46,6 @@ const makeScssSemantics = (
     return out.join('\n')
   }
 
-  // With custom themes: emit a mixin per theme that sets CSS custom props,
-  // plus a top-level $... = var(--...) shortcut.
   bound.forEach((t) => {
     out.push(`$${tokenName(t.pathNames)}: var(--${tokenName(t.pathNames)});`)
   })

@@ -38,7 +38,6 @@ const makeStyleDictionaryV3Semantics = (
   const aliasFor = (colorName: string, shadeName: string) =>
     `{color.${new Case(colorName).doKebabCase()}.${shadeName}}`
 
-  // Default tokens nested under 'semantic'
   const semantic: Record<string, unknown> = {}
   bound.forEach((t) => {
     const keys = t.pathNames.map((p) => new Case(p).doKebabCase())
@@ -56,7 +55,6 @@ const makeStyleDictionaryV3Semantics = (
   })
   root['semantic'] = semantic
 
-  // Per-theme overrides as additional nested groups
   customThemes.forEach((theme) => {
     const themeKey = new Case(theme.name).doKebabCase()
     const themeBlock: Record<string, unknown> = {}

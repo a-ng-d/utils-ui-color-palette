@@ -79,7 +79,6 @@ export default class DominantColors {
             throw new Error('Failed to create canvas context')
           }
 
-          // Resize image if needed
           const aspectRatio = img.width / img.height
           let targetWidth = img.width
           let targetHeight = img.height

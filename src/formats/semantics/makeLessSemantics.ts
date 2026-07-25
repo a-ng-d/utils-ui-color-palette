@@ -44,7 +44,6 @@ const makeLessSemantics = (
     return out.join('\n')
   }
 
-  // With custom themes: rules per theme using less mixin pattern (functions)
   themes.forEach((theme) => {
     const isDefault = theme.type === 'default theme'
     const fnName = `${new Case(theme.name).doKebabCase()}-semantics`
