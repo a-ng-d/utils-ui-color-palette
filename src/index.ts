@@ -57,6 +57,7 @@ export type {
   SystemData,
   SystemDataToken,
   SystemDataRef,
+  SystemLibraryData,
 } from '@tps/system.types'
 export type { CodeFile } from '@tps/code.types'
 export type { ColorFormat } from '@tps/model.types'

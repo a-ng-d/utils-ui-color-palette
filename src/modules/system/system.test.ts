@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { SystemConfiguration } from '@tps/system.types'
+import { SystemConfiguration, SystemLibraryData } from '@tps/system.types'
 import { PaletteData } from '@tps/data.types'
 import System from './system'
 
@@ -395,5 +395,108 @@ describe('System', () => {
 
     console.log('\n=== SystemData (full output) ===\n')
     console.log(JSON.stringify(sys, null, 2))
+  })
+
+  describe('makeSystemLibraryData', () => {
+    it('produces one row per token per theme, with a deterministic id', () => {
+      const lib = new System({
+        paletteData,
+        system: {
+          schema: baseSchema,
+          bindings: [{ path: ['m_bg', 'm_pri', 'm_def'], ref: 'blueId:400' }],
+        },
+      }).makeSystemLibraryData()
+
+      // 8 tokens × 2 themes
+      expect(lib).toHaveLength(16)
+
+      const row = lib.find(
+        (r) => r.themeId === 'lightId' && r.path.join('/') === 'm_bg/m_pri/m_def'
+      )!
+      expect(row.id).toBe('lightId:m_bg>m_pri>m_def')
+      expect(row.shadeId).toBe('lightId:blueId:400')
+      expect(row.isExcluded).toBe(false)
+    })
+
+    it('flags isExcluded rows so a bridge can drop the asset', () => {
+      const lib = new System({
+        paletteData,
+        system: {
+          schema: baseSchema,
+          bindings: [
+            {
+              path: ['m_txt', 'm_pri', 'm_def'],
+              ref: 'blueId:400',
+              isExcluded: true,
+            },
+          ],
+        },
+      }).makeSystemLibraryData()
+
+      const excludedRows = lib.filter(
+        (r) => r.path.join('/') === 'm_txt/m_pri/m_def'
+      )
+      expect(excludedRows).toHaveLength(2)
+      excludedRows.forEach((r) => {
+        expect(r.isExcluded).toBe(true)
+        expect(r.shadeId).toBeNull()
+      })
+    })
+
+    it('carries forward asset ids from previousData by matching id', () => {
+      const system = new System({
+        paletteData,
+        system: {
+          schema: baseSchema,
+          bindings: [{ path: ['m_bg', 'm_pri', 'm_def'], ref: 'blueId:400' }],
+        },
+      })
+
+      const previousData: Array<SystemLibraryData> = [
+        {
+          id: 'lightId:m_bg>m_pri>m_def',
+          path: ['m_bg', 'm_pri', 'm_def'],
+          pathNames: ['background', 'primary', 'default'],
+          themeId: 'lightId',
+          shadeId: 'lightId:blueId:400',
+          isExcluded: false,
+          variableId: 'VAR_123',
+          collectionId: 'COL_1',
+          modeId: 'MODE_LIGHT',
+        },
+      ]
+
+      const lib = system.makeSystemLibraryData(
+        ['variable_id', 'collection_id', 'mode_id'],
+        previousData
+      )
+
+      const row = lib.find((r) => r.id === 'lightId:m_bg>m_pri>m_def')!
+      expect(row.variableId).toBe('VAR_123')
+      expect(row.collectionId).toBe('COL_1')
+      expect(row.modeId).toBe('MODE_LIGHT')
+
+      // dark theme row for the same token is a distinct id, no previous match
+      const darkRow = lib.find((r) => r.id === 'darkId:m_bg>m_pri>m_def')!
+      expect(darkRow.variableId).toBeUndefined()
+    })
+
+    it('omits asset id fields not requested via options', () => {
+      const lib = new System({
+        paletteData,
+        system: { schema: baseSchema },
+      }).makeSystemLibraryData()
+
+      lib.forEach((row) => {
+        expect(row.variableId).toBeUndefined()
+        expect(row.styleId).toBeUndefined()
+        expect(row.collectionId).toBeUndefined()
+        expect(row.modeId).toBeUndefined()
+        expect(row.catalogId).toBeUndefined()
+        expect(row.setId).toBeUndefined()
+        expect(row.tokenId).toBeUndefined()
+        expect(row.description).toBeUndefined()
+      })
+    })
   })
 })
