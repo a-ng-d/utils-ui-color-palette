@@ -44,3 +44,20 @@ export interface SystemData {
   tokens: Array<SystemDataToken>
   type: 'system'
 }
+
+export interface SystemLibraryData {
+  id: string
+  path: Array<string>
+  pathNames: Array<string>
+  themeId: string
+  shadeId: string | null
+  isExcluded: boolean
+  description?: string
+  collectionId?: string
+  modeId?: string
+  variableId?: string
+  styleId?: string
+  catalogId?: string
+  setId?: string
+  tokenId?: string
+}

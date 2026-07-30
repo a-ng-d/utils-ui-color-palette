@@ -3,6 +3,7 @@ import {
   SystemData,
   SystemDataRef,
   SystemDataToken,
+  SystemLibraryData,
   TaxonomyBinding,
   TaxonomySchema,
 } from '@tps/system.types'
@@ -113,5 +114,66 @@ export default class System {
     const color = theme.colors.find((c) => c.id === colorId)
     if (!color) return false
     return color.shades.some((s) => s.name === shadeName)
+  }
+
+  makeSystemLibraryData = (
+    options?: Array<
+      | 'collection_id'
+      | 'mode_id'
+      | 'variable_id'
+      | 'style_id'
+      | 'catalog_id'
+      | 'set_id'
+      | 'token_id'
+      | 'description'
+    >,
+    previousData?: Array<SystemLibraryData>
+  ) => {
+    const systemData = this.makeSystemData()
+
+    const systemLibraryData: Array<SystemLibraryData> =
+      systemData.tokens.flatMap((token) =>
+        token.refs.map((ref) => {
+          const generatedId = `${ref.themeId}:${token.path.join('>')}`
+          const previousItem = previousData?.find(
+            (item) => item.id === generatedId
+          )
+
+          return {
+            id: generatedId,
+            path: token.path,
+            pathNames: token.pathNames,
+            themeId: ref.themeId,
+            shadeId: ref.shadeId,
+            isExcluded: token.isExcluded,
+            ...(options?.includes('description') && {
+              description: token.description,
+            }),
+            ...(options?.includes('collection_id') && {
+              collectionId: previousItem?.collectionId,
+            }),
+            ...(options?.includes('mode_id') && {
+              modeId: previousItem?.modeId,
+            }),
+            ...(options?.includes('variable_id') && {
+              variableId: previousItem?.variableId,
+            }),
+            ...(options?.includes('style_id') && {
+              styleId: previousItem?.styleId,
+            }),
+            ...(options?.includes('catalog_id') && {
+              catalogId: previousItem?.catalogId,
+            }),
+            ...(options?.includes('set_id') && {
+              setId: previousItem?.setId,
+            }),
+            ...(options?.includes('token_id') && {
+              tokenId: previousItem?.tokenId,
+            }),
+          }
+        })
+      )
+
+    return systemLibraryData
   }
 }
