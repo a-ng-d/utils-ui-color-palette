@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.0] - 2026-08-05
+
+### Added
+
+- New `shift` module exposing `resolveShift`, `normalizeShift`, `makeDefaultShift`, `areShiftsEqual`, plus the `SHIFT_CURVES` / `SHIFT_NEUTRAL` / `SHIFT_BOUNDS` constants
+- Three shift curves — `LINEAR` (flat, the previous behaviour), `HYPERBOLA` (thresholds mirrored around the neutral) and `FREE` (independent thresholds) — letting the hue and the chroma be offset differently on the shades and on the tints
+- `ShiftCurve` and `ShiftCurveConfiguration` types
+
+### Changed
+
+- A shift is no longer a scalar but a `{ min, max, value, curve }` object. Affects the `ShiftConfiguration.hue` / `.chroma`, `ColorConfiguration.hue.shift` / `.chroma.shift` and `SourceColorConfiguration.hue?.shift` / `.chroma?.shift` **types**
+- `Data` resolves each shift per stop against the theme's own lightness range (`Math.min`/`Math.max` over `theme.scale`), the neutral being anchored at the middle of that range
+
+### Migration
+
+- **Runtime is backward compatible** — `Data` runs `normalizeShift` on every color it reads, so palette data written before this release renders identically without any change on the caller's side. A legacy scalar becomes `{ min: n, max: n, value: n, curve: 'LINEAR' }`
+- **TypeScript is not** — a consumer still writing `shift: 100` will fail to compile until it moves to the object shape. The break is loud and happens at build time, never at render time
+- `normalizeShift` is idempotent and also accepts partial objects, `undefined` and `null`; call it at every point where palette data is read back from storage or from the network
+- `Color` is unchanged: it still takes `hueShifting` and `chromaShifting` as already-resolved scalars
+
 ## [1.10.3] - 2026-07-25
 
 ### Added

@@ -71,9 +71,11 @@ import {
   Data,
   DominantColors,
   ColorHarmony,
+  resolveShift,
 } from '@yelbolt/engine-ui-color-palette'
 
 // Use Color class for color manipulation
+// hueShifting and chromaShifting are scalars, already resolved for this stop
 const color = new Color({
   sourceColor: [255, 0, 0], // RGB values
   lightness: 50,
@@ -325,6 +327,49 @@ paletteData.themes[0].colors[0].shades.forEach((shade) => {
   }
 })
 ```
+
+### Hue & Chroma Shift
+
+Each color carries a hue and a chroma shift describing how it is offset across the scale. A shift
+is an object — `{ min, max, value, curve }` — where `min` is the threshold reached on the darkest
+stop, `max` the one reached on the lightest stop, and `value` the flat offset used by the `LINEAR`
+curve. Both are expressed in the channel's own unit, around its neutral: degrees around `0` for
+the hue, percent around `100` for the chroma.
+
+| Curve       | Behaviour                                                                              |
+| ----------- | -------------------------------------------------------------------------------------- |
+| `LINEAR`    | Applies `value` on every stop, ignoring the thresholds — the default                   |
+| `HYPERBOLA` | Interpolates `min` → neutral → `max`, with both thresholds mirrored around the neutral |
+| `FREE`      | Interpolates `min` → neutral → `max`, with both thresholds set independently           |
+
+`HYPERBOLA` and `FREE` share the same interpolation: the neutral is anchored at the middle of the
+scale, so the offset builds up on the shades and the tints and fades out in the center. Mirroring
+the thresholds is what makes a shift a `HYPERBOLA` — it is a constraint the caller applies when
+writing `min` and `max`, not a different formula.
+
+```typescript
+import {
+  makeDefaultShift,
+  normalizeShift,
+  resolveShift,
+} from '@yelbolt/engine-ui-color-palette'
+
+const shift = { min: -5, max: 15, value: 0, curve: 'FREE' as const }
+const range = { min: 10, max: 90 } // the darkest and lightest stops of the scale
+
+resolveShift(shift, 10, range, 'HUE') // -5  — darkest stop
+resolveShift(shift, 50, range, 'HUE') // 0   — neutral, at the middle of the scale
+resolveShift(shift, 90, range, 'HUE') // 15  — lightest stop
+
+// A shift read from storage may predate this model, when it was a single scalar.
+// normalizeShift accepts a number, a partial object or nothing at all, and is idempotent.
+normalizeShift(15, 'HUE') // { min: 15, max: 15, value: 15, curve: 'LINEAR' }
+normalizeShift(undefined, 'CHROMA') // makeDefaultShift('CHROMA')
+```
+
+`Data` normalizes and resolves every shift on its own, so passing legacy palette data to it keeps
+rendering exactly as before. `resolveShift` is exported for callers that build colors themselves
+through the `Color` class, which takes already-resolved scalars.
 
 ### Color System & Semantic Tokens
 

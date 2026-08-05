@@ -40,11 +40,11 @@ export interface SourceColorConfiguration {
   id: string
   isRemovable: boolean
   hue?: {
-    shift: number
+    shift: ShiftCurveConfiguration
     isLocked: boolean
   }
   chroma?: {
-    shift: number
+    shift: ShiftCurveConfiguration
     isLocked: boolean
   }
 }
@@ -87,9 +87,18 @@ export interface PresetConfiguration {
 
 export type ScaleConfiguration = Record<string, number>
 
+export type ShiftCurve = 'LINEAR' | 'HYPERBOLA' | 'FREE'
+
+export interface ShiftCurveConfiguration {
+  min: number
+  max: number
+  value: number
+  curve: ShiftCurve
+}
+
 export interface ShiftConfiguration {
-  chroma: number
-  hue: number
+  chroma: ShiftCurveConfiguration
+  hue: ShiftCurveConfiguration
 }
 
 export type LockedSourceColorsConfiguration = boolean
@@ -100,11 +109,11 @@ export interface ColorConfiguration {
   description: string
   rgb: RgbModel
   hue: {
-    shift: number
+    shift: ShiftCurveConfiguration
     isLocked: boolean
   }
   chroma: {
-    shift: number
+    shift: ShiftCurveConfiguration
     isLocked: boolean
   }
   alpha: {

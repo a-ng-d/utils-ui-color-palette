@@ -14,6 +14,7 @@ import {
   FullConfiguration,
 } from '@tps/configuration.types'
 import { Channel, ChannelWithAlpha, HexModel } from '@tps/color.types'
+import { normalizeShift, resolveShift } from '@modules/shift/shift'
 import Contrast from '@modules/contrast/contrast'
 import Color from '@modules/color/color'
 
@@ -89,7 +90,14 @@ export default class Data {
         textColorsTheme: theme.textColorsTheme,
         type: theme.type,
       }
+      const stops = Object.values(theme.scale)
+      const lightnessRange = {
+        min: Math.min(...stops),
+        max: Math.max(...stops),
+      }
       this.base.colors.forEach((color) => {
+        const hueShift = normalizeShift(color.hue?.shift, 'HUE')
+        const chromaShift = normalizeShift(color.chroma?.shift, 'CHROMA')
         const scaledColors = Object.entries(theme.scale)
           .reverse()
           .map((lightness) => {
@@ -102,10 +110,18 @@ export default class Data {
                   color.rgb.b * 255,
                 ],
                 alpha: parseFloat((lightness[1] / 100).toFixed(2)),
-                hueShifting:
-                  color.hue.shift !== undefined ? color.hue.shift : 0,
-                chromaShifting:
-                  color.chroma.shift !== undefined ? color.chroma.shift : 100,
+                hueShifting: resolveShift(
+                  hueShift,
+                  lightness[1],
+                  lightnessRange,
+                  'HUE'
+                ),
+                chromaShifting: resolveShift(
+                  chromaShift,
+                  lightness[1],
+                  lightnessRange,
+                  'CHROMA'
+                ),
                 algorithmVersion: this.base.algorithmVersion,
                 visionSimulationMode: theme.visionSimulationMode,
               })
@@ -225,10 +241,18 @@ export default class Data {
                   color.rgb.b * 255,
                 ],
                 lightness: lightness[1],
-                hueShifting:
-                  color.hue.shift !== undefined ? color.hue.shift : 0,
-                chromaShifting:
-                  color.chroma.shift !== undefined ? color.chroma.shift : 100,
+                hueShifting: resolveShift(
+                  hueShift,
+                  lightness[1],
+                  lightnessRange,
+                  'HUE'
+                ),
+                chromaShifting: resolveShift(
+                  chromaShift,
+                  lightness[1],
+                  lightnessRange,
+                  'CHROMA'
+                ),
                 algorithmVersion: this.base.algorithmVersion,
                 visionSimulationMode: theme.visionSimulationMode,
               })
