@@ -21,8 +21,8 @@ describe('Code', () => {
       easing: 'LINEAR',
     },
     shift: {
-      chroma: 100,
-      hue: 0,
+      chroma: { min: 100, max: 100, value: 100, curve: 'LINEAR' },
+      hue: { min: 0, max: 0, value: 0, curve: 'LINEAR' },
     },
     colors: [
       {
@@ -34,8 +34,14 @@ describe('Code', () => {
           isEnabled: false,
           backgroundColor: '#FFFFFF',
         },
-        hue: { shift: 0, isLocked: false },
-        chroma: { shift: 100, isLocked: false },
+        hue: {
+          shift: { min: 0, max: 0, value: 0, curve: 'LINEAR' },
+          isLocked: false,
+        },
+        chroma: {
+          shift: { min: 100, max: 100, value: 100, curve: 'LINEAR' },
+          isLocked: false,
+        },
       },
       {
         id: 'color2',
@@ -46,8 +52,14 @@ describe('Code', () => {
           isEnabled: false,
           backgroundColor: '#FFFFFF',
         },
-        hue: { shift: 0, isLocked: false },
-        chroma: { shift: 100, isLocked: false },
+        hue: {
+          shift: { min: 0, max: 0, value: 0, curve: 'LINEAR' },
+          isLocked: false,
+        },
+        chroma: {
+          shift: { min: 100, max: 100, value: 100, curve: 'LINEAR' },
+          isLocked: false,
+        },
       },
       {
         id: 'color3',
@@ -58,8 +70,14 @@ describe('Code', () => {
           isEnabled: true,
           backgroundColor: '#FFFFFF',
         },
-        hue: { shift: 0, isLocked: false },
-        chroma: { shift: 100, isLocked: false },
+        hue: {
+          shift: { min: 0, max: 0, value: 0, curve: 'LINEAR' },
+          isLocked: false,
+        },
+        chroma: {
+          shift: { min: 100, max: 100, value: 100, curve: 'LINEAR' },
+          isLocked: false,
+        },
       },
     ],
     colorSpace: 'LCH',
@@ -334,8 +352,8 @@ describe('Code', () => {
         easing: 'LINEAR' as EasingConfiguration,
       },
       shift: {
-        chroma: 0,
-        hue: 0,
+        chroma: { min: 0, max: 0, value: 0, curve: 'LINEAR' as const },
+        hue: { min: 0, max: 0, value: 0, curve: 'LINEAR' as const },
       },
       colors: [],
       colorSpace: 'LCH' as const,
@@ -369,6 +387,113 @@ describe('Code', () => {
     const result = data.makePaletteFullData()
     expect(result).toBeDefined()
     expect(result.type).toBe('UI_COLOR_PALETTE')
+  })
+
+  describe('Shift Curve Handling', () => {
+    const wideTheme: ThemeConfiguration = {
+      ...mockTheme,
+      scale: {
+        '900': 90,
+        '500': 50,
+        '100': 10,
+      },
+    }
+
+    const makeBaseWithShift = (
+      hueShift: unknown,
+      chromaShift: unknown
+    ): BaseConfiguration =>
+      ({
+        ...mockBase,
+        colors: [
+          {
+            id: 'color1',
+            name: 'Test Color A',
+            description: 'A test color',
+            rgb: { r: 0.4, g: 0.6, b: 0.85 },
+            alpha: {
+              isEnabled: false,
+              backgroundColor: '#FFFFFF',
+            },
+            hue: { shift: hueShift, isLocked: false },
+            chroma: { shift: chromaShift, isLocked: false },
+          },
+        ],
+      }) as BaseConfiguration
+
+    const hexesOf = (base: BaseConfiguration): Array<string> =>
+      new Data({ base: base, themes: [wideTheme], meta: mockMeta })
+        .makePaletteData()
+        .themes[0].colors[0].shades.filter((shade) => shade.name !== 'source')
+        .map((shade) => shade.hex)
+
+    it('should render a legacy scalar shift exactly like its LINEAR equivalent', () => {
+      const legacy = hexesOf(makeBaseWithShift(15, 130))
+      const migrated = hexesOf(
+        makeBaseWithShift(
+          { min: 15, max: 15, value: 15, curve: 'LINEAR' },
+          { min: 130, max: 130, value: 130, curve: 'LINEAR' }
+        )
+      )
+
+      expect(legacy).toEqual(migrated)
+    })
+
+    it('should render an undefined shift exactly like a neutral LINEAR shift', () => {
+      const missing = hexesOf(makeBaseWithShift(undefined, undefined))
+      const neutral = hexesOf(
+        makeBaseWithShift(
+          { min: 0, max: 0, value: 0, curve: 'LINEAR' },
+          { min: 100, max: 100, value: 100, curve: 'LINEAR' }
+        )
+      )
+
+      expect(missing).toEqual(neutral)
+    })
+
+    it('should ignore the thresholds on a LINEAR curve', () => {
+      const withThresholds = hexesOf(
+        makeBaseWithShift(
+          { min: -180, max: 180, value: 15, curve: 'LINEAR' },
+          { min: 0, max: 200, value: 130, curve: 'LINEAR' }
+        )
+      )
+
+      expect(withThresholds).toEqual(hexesOf(makeBaseWithShift(15, 130)))
+    })
+
+    it('should diverge on the extremities with a non-LINEAR curve', () => {
+      const linear = hexesOf(
+        makeBaseWithShift(
+          { min: -30, max: 30, value: 0, curve: 'LINEAR' },
+          { min: 100, max: 100, value: 100, curve: 'LINEAR' }
+        )
+      )
+      const hyperbola = hexesOf(
+        makeBaseWithShift(
+          { min: -30, max: 30, value: 0, curve: 'HYPERBOLA' },
+          { min: 100, max: 100, value: 100, curve: 'LINEAR' }
+        )
+      )
+
+      expect(hyperbola[0]).not.toBe(linear[0])
+      expect(hyperbola[2]).not.toBe(linear[2])
+      expect(hyperbola[1]).toBe(linear[1])
+    })
+
+    it('should shift the shades and the tints in opposite directions', () => {
+      const shades = hexesOf(
+        makeBaseWithShift(
+          { min: 0, max: 0, value: 0, curve: 'LINEAR' },
+          { min: 40, max: 160, value: 100, curve: 'FREE' }
+        )
+      )
+      const neutral = hexesOf(makeBaseWithShift(0, 100))
+
+      expect(shades[0]).not.toBe(neutral[0])
+      expect(shades[1]).toBe(neutral[1])
+      expect(shades[2]).not.toBe(neutral[2])
+    })
   })
 
   it('should retrieve styleId, variableId, collectionId, and modeId from previousData', () => {

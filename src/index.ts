@@ -19,6 +19,8 @@ export type {
   EasingConfiguration,
   PresetConfiguration,
   ShiftConfiguration,
+  ShiftCurve,
+  ShiftCurveConfiguration,
   ScaleConfiguration,
   LockedSourceColorsConfiguration,
   ColorConfiguration,
@@ -69,3 +71,13 @@ export { default as System } from '@modules/system/system'
 export { default as Code } from '@modules/code/code'
 export { default as DominantColors } from '@modules/dominant-colors/dominant-colors'
 export { default as ColorHarmony } from '@modules/color-harmony/color-harmony'
+export {
+  SHIFT_CURVES,
+  SHIFT_NEUTRAL,
+  SHIFT_BOUNDS,
+  makeDefaultShift,
+  normalizeShift,
+  areShiftsEqual,
+  resolveShift,
+} from '@modules/shift/shift'
+export type { ShiftChannel } from '@modules/shift/shift'

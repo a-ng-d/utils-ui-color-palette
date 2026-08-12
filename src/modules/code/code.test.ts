@@ -23,8 +23,8 @@ describe('Code with primitives', () => {
       easing: 'LINEAR',
     },
     shift: {
-      chroma: 100,
-      hue: 0,
+      chroma: { min: 100, max: 100, value: 100, curve: 'LINEAR' },
+      hue: { min: 0, max: 0, value: 0, curve: 'LINEAR' },
     },
     colors: [
       {
@@ -36,8 +36,14 @@ describe('Code with primitives', () => {
           isEnabled: false,
           backgroundColor: '#FFFFFF',
         },
-        hue: { shift: 0, isLocked: false },
-        chroma: { shift: 100, isLocked: false },
+        hue: {
+          shift: { min: 0, max: 0, value: 0, curve: 'LINEAR' },
+          isLocked: false,
+        },
+        chroma: {
+          shift: { min: 100, max: 100, value: 100, curve: 'LINEAR' },
+          isLocked: false,
+        },
       },
       {
         id: 'color2',
@@ -48,8 +54,14 @@ describe('Code with primitives', () => {
           isEnabled: false,
           backgroundColor: '#FFFFFF',
         },
-        hue: { shift: 0, isLocked: false },
-        chroma: { shift: 100, isLocked: false },
+        hue: {
+          shift: { min: 0, max: 0, value: 0, curve: 'LINEAR' },
+          isLocked: false,
+        },
+        chroma: {
+          shift: { min: 100, max: 100, value: 100, curve: 'LINEAR' },
+          isLocked: false,
+        },
       },
       {
         id: 'color3',
@@ -60,8 +72,14 @@ describe('Code with primitives', () => {
           isEnabled: true,
           backgroundColor: '#FFFFFF',
         },
-        hue: { shift: 0, isLocked: false },
-        chroma: { shift: 100, isLocked: false },
+        hue: {
+          shift: { min: 0, max: 0, value: 0, curve: 'LINEAR' },
+          isLocked: false,
+        },
+        chroma: {
+          shift: { min: 100, max: 100, value: 100, curve: 'LINEAR' },
+          isLocked: false,
+        },
       },
     ],
     colorSpace: 'LCH',
