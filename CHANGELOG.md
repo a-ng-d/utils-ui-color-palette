@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.0] - 2026-08-16
+
+### Added
+
+- New `Preview` class (`src/modules/color/preview.ts`) for building live gradient previews from a single source color, used to drive dynamic slider tracks:
+  - `sampleShift(channel, options?)` — samples what the source color becomes across a shift slider's whole domain (chroma `[0,200]` or hue `[-180,180]`), holding the other channel neutral. Independent of the shift curve (`LINEAR`/`HYPERBOLA`/`FREE`): the curve only affects how `min`/`max`/`value` combine downstream via `resolveShift`, not this preview
+  - `sampleLightness(shift, lightnessRange, options?)` — samples across a lightness domain (default `0-100`), resolving the *configured* hue/chroma shift via `resolveShift` at each swept lightness, the same way `Data` renders the real scale — as opposed to `sampleShift`, which holds shift neutral
+  - `Preview.blend(tracks)` — static method merging several equally-sampled gradients (same `steps`, same offsets) into one by averaging the color every track has at each offset. Meant for palettes with too many source colors to preview as separate tracks; a blended stop is flagged out-of-gamut as soon as any one contributor is, so the warning is never hidden by averaging it away
+- Out-of-gamut detection on every sampled stop (`ShiftGradientStop.outOfGamut`) — via chroma-js's `Color#clipped()` for LCH/OKLCH/LAB/OKLAB/HSL/HSV, and a manual pre-clamp RGB-range check for HSLUV, which has no chroma-js equivalent. CMYK/RGB/HEX/P3 aren't chroma/hue-driven scale spaces in this engine and fall back to an LCH sample rather than throwing
+- `ShiftGradientStop`, `PreviewOptions`, `SampleShiftOptions`, `SampleLightnessOptions` types exported from the package root
+
 ## [1.11.0] - 2026-08-05
 
 ### Added

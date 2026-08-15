@@ -65,6 +65,13 @@ export type { CodeFile } from '@tps/code.types'
 export type { ColorFormat } from '@tps/model.types'
 
 export { default as Color } from '@modules/color/color'
+export { default as Preview } from '@modules/color/preview'
+export type {
+  ShiftGradientStop,
+  PreviewOptions,
+  SampleShiftOptions,
+  SampleLightnessOptions,
+} from '@modules/color/preview'
 export { default as Contrast } from '@modules/contrast/contrast'
 export { default as Data } from '@modules/data/data'
 export { default as System } from '@modules/system/system'
