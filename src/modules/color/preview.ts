@@ -3,9 +3,9 @@ import chroma from 'chroma-js'
 import {
   AlgorithmVersionConfiguration,
   ColorSpaceConfiguration,
+  ShiftCurveConfiguration,
   VisionSimulationModeConfiguration,
 } from '@tps/configuration.types'
-import { ShiftCurveConfiguration } from '@tps/configuration.types'
 import { Channel } from '@tps/color.types'
 import {
   resolveShift,
@@ -21,11 +21,20 @@ export interface ShiftGradientStop {
   outOfGamut: boolean
 }
 
-export interface SampleShiftGradientOptions {
-  steps?: number
+export interface PreviewOptions {
+  sourceColor: Channel
   colorSpace?: ColorSpaceConfiguration
   algorithmVersion?: AlgorithmVersionConfiguration
   visionSimulationMode?: VisionSimulationModeConfiguration
+}
+
+export interface SampleShiftOptions {
+  steps?: number
+}
+
+export interface SampleLightnessOptions {
+  steps?: number
+  domain?: { min: number; max: number }
 }
 
 const lerp = (from: number, to: number, ratio: number): number =>
@@ -258,120 +267,115 @@ const sampleColorAt = (
   )
 }
 
-export const sampleShiftGradient = (
-  sourceColor: Channel,
-  channel: ShiftChannel,
-  options: SampleShiftGradientOptions = {}
-): ShiftGradientStop[] => {
-  const {
-    steps = 12,
+export default class Preview {
+  private sourceColor: Channel
+  private colorSpace: ColorSpaceConfiguration
+  private algorithmVersion: AlgorithmVersionConfiguration
+  private visionSimulationMode: VisionSimulationModeConfiguration
+
+  constructor({
+    sourceColor,
     colorSpace = 'LCH',
     algorithmVersion = 'v3',
     visionSimulationMode = 'NONE',
-  } = options
+  }: PreviewOptions) {
+    this.sourceColor = sourceColor
+    this.colorSpace = colorSpace
+    this.algorithmVersion = algorithmVersion
+    this.visionSimulationMode = visionSimulationMode
+  }
 
-  const [lowerBound, upperBound] = SHIFT_BOUNDS[channel]
+  sampleShift = (
+    channel: ShiftChannel,
+    options: SampleShiftOptions = {}
+  ): ShiftGradientStop[] => {
+    const { steps = 12 } = options
+    const [lowerBound, upperBound] = SHIFT_BOUNDS[channel]
 
-  return Array.from({ length: steps }, (_, i) => {
-    const t = steps === 1 ? 0 : i / (steps - 1)
-    const shiftValue = lerp(lowerBound, upperBound, t)
-    const hueShifting = channel === 'HUE' ? shiftValue : 0
-    const chromaShifting =
-      channel === 'CHROMA' ? shiftValue : SHIFT_NEUTRAL.CHROMA
+    return Array.from({ length: steps }, (_, i) => {
+      const t = steps === 1 ? 0 : i / (steps - 1)
+      const shiftValue = lerp(lowerBound, upperBound, t)
+      const hueShifting = channel === 'HUE' ? shiftValue : 0
+      const chromaShifting =
+        channel === 'CHROMA' ? shiftValue : SHIFT_NEUTRAL.CHROMA
 
-    const sample = sampleColorAt(
-      sourceColor,
-      colorSpace,
-      hueShifting,
-      chromaShifting,
-      algorithmVersion,
-      visionSimulationMode
-    )
-
-    return {
-      offset: t,
-      color: chroma(sample.rgb).hex(),
-      outOfGamut: sample.outOfGamut,
-    }
-  })
-}
-
-export interface SampleLightnessGradientOptions {
-  steps?: number
-  domain?: { min: number; max: number }
-  colorSpace?: ColorSpaceConfiguration
-  algorithmVersion?: AlgorithmVersionConfiguration
-  visionSimulationMode?: VisionSimulationModeConfiguration
-}
-
-export const sampleLightnessGradient = (
-  sourceColor: Channel,
-  shift: { hue: ShiftCurveConfiguration; chroma: ShiftCurveConfiguration },
-  lightnessRange: { min: number; max: number },
-  options: SampleLightnessGradientOptions = {}
-): ShiftGradientStop[] => {
-  const {
-    steps = 12,
-    domain = { min: 0, max: 100 },
-    colorSpace = 'LCH',
-    algorithmVersion = 'v3',
-    visionSimulationMode = 'NONE',
-  } = options
-
-  return Array.from({ length: steps }, (_, i) => {
-    const t = steps === 1 ? 0 : i / (steps - 1)
-    const lightness = lerp(domain.min, domain.max, t)
-    const hueShifting = resolveShift(
-      shift.hue,
-      lightness,
-      lightnessRange,
-      'HUE'
-    )
-    const chromaShifting = resolveShift(
-      shift.chroma,
-      lightness,
-      lightnessRange,
-      'CHROMA'
-    )
-
-    const sample = sampleColorAt(
-      sourceColor,
-      colorSpace,
-      hueShifting,
-      chromaShifting,
-      algorithmVersion,
-      visionSimulationMode,
-      lightness
-    )
-
-    return {
-      offset: t,
-      color: chroma(sample.rgb).hex(),
-      outOfGamut: sample.outOfGamut,
-    }
-  })
-}
-
-export const blendShiftGradients = (
-  tracks: ShiftGradientStop[][]
-): ShiftGradientStop[] => {
-  const [first, ...rest] = tracks
-  if (first === undefined) return []
-  if (rest.length === 0) return first
-
-  return first.map((stop, index) => {
-    const contributors = tracks
-      .map((track) => track[index])
-      .filter(
-        (candidate): candidate is ShiftGradientStop => candidate !== undefined
+      const sample = sampleColorAt(
+        this.sourceColor,
+        this.colorSpace,
+        hueShifting,
+        chromaShifting,
+        this.algorithmVersion,
+        this.visionSimulationMode
       )
 
-    return {
-      offset: stop.offset,
-      color: chroma
-        .average(contributors.map((candidate) => candidate.color))
-        .hex(),
-      outOfGamut: contributors.some((candidate) => candidate.outOfGamut),
-    }
-  })
+      return {
+        offset: t,
+        color: chroma(sample.rgb).hex(),
+        outOfGamut: sample.outOfGamut,
+      }
+    })
+  }
+
+  sampleLightness = (
+    shift: { hue: ShiftCurveConfiguration; chroma: ShiftCurveConfiguration },
+    lightnessRange: { min: number; max: number },
+    options: SampleLightnessOptions = {}
+  ): ShiftGradientStop[] => {
+    const { steps = 12, domain = { min: 0, max: 100 } } = options
+
+    return Array.from({ length: steps }, (_, i) => {
+      const t = steps === 1 ? 0 : i / (steps - 1)
+      const lightness = lerp(domain.min, domain.max, t)
+      const hueShifting = resolveShift(
+        shift.hue,
+        lightness,
+        lightnessRange,
+        'HUE'
+      )
+      const chromaShifting = resolveShift(
+        shift.chroma,
+        lightness,
+        lightnessRange,
+        'CHROMA'
+      )
+
+      const sample = sampleColorAt(
+        this.sourceColor,
+        this.colorSpace,
+        hueShifting,
+        chromaShifting,
+        this.algorithmVersion,
+        this.visionSimulationMode,
+        lightness
+      )
+
+      return {
+        offset: t,
+        color: chroma(sample.rgb).hex(),
+        outOfGamut: sample.outOfGamut,
+      }
+    })
+  }
+
+  static blend = (tracks: ShiftGradientStop[][]): ShiftGradientStop[] => {
+    const [first, ...rest] = tracks
+    if (first === undefined) return []
+    if (rest.length === 0) return first
+
+    return first.map((stop, index) => {
+      const contributors = tracks
+        .map((track) => track[index])
+        .filter(
+          (candidate): candidate is ShiftGradientStop => candidate !== undefined
+        )
+
+      return {
+        offset: stop.offset,
+        color: chroma
+          .average(contributors.map((candidate) => candidate.color))
+          .hex(),
+        outOfGamut: contributors.some((candidate) => candidate.outOfGamut),
+      }
+    })
+  }
 }
