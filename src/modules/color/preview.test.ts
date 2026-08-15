@@ -1,0 +1,243 @@
+import { describe, it, expect } from 'vitest'
+import chroma from 'chroma-js'
+import { ShiftCurveConfiguration } from '@tps/configuration.types'
+import { Channel } from '@tps/color.types'
+import { makeDefaultShift, SHIFT_BOUNDS } from '@modules/shift/shift'
+import {
+  blendShiftGradients,
+  sampleLightnessGradient,
+  sampleShiftGradient,
+} from './preview'
+
+describe('sampleShiftGradient', () => {
+  const sourceColor: Channel = [200, 60, 60]
+
+  it('should return the requested number of stops, spanning offsets 0 to 1', () => {
+    const stops = sampleShiftGradient(sourceColor, 'HUE', { steps: 8 })
+
+    expect(stops).toHaveLength(8)
+    expect(stops[0].offset).toBe(0)
+    expect(stops[stops.length - 1].offset).toBe(1)
+  })
+
+  it('should return a single stop at offset 0 when steps is 1', () => {
+    const stops = sampleShiftGradient(sourceColor, 'CHROMA', { steps: 1 })
+
+    expect(stops).toHaveLength(1)
+    expect(stops[0].offset).toBe(0)
+  })
+
+  it('should return a valid hex color for every stop', () => {
+    const stops = sampleShiftGradient(sourceColor, 'HUE')
+    const hexRegex = /^#([0-9A-Fa-f]{3}){1,2}$/
+
+    stops.forEach((stop) => expect(stop.color).toMatch(hexRegex))
+  })
+
+  it('should keep the neutral point close to the source color for CHROMA', () => {
+    const stops = sampleShiftGradient(sourceColor, 'CHROMA', {
+      steps: 3,
+      algorithmVersion: 'v1',
+    })
+    const neutralStop = stops[1]
+
+    const distance = chroma.distance(
+      neutralStop.color,
+      chroma(sourceColor).hex()
+    )
+    expect(distance).toBeLessThan(5)
+  })
+
+  it('should flag stops as out of gamut when pushed to extreme chroma', () => {
+    const stops = sampleShiftGradient(sourceColor, 'CHROMA', {
+      steps: 6,
+      colorSpace: 'LCH',
+    })
+
+    expect(stops.some((stop) => stop.outOfGamut)).toBe(true)
+  })
+
+  it('should not flag a neutral/near-neutral gray as out of gamut', () => {
+    const gray: Channel = [128, 128, 128]
+    const stops = sampleShiftGradient(gray, 'HUE', { steps: 6 })
+
+    expect(stops.every((stop) => stop.outOfGamut === false)).toBe(true)
+  })
+
+  it('should span the documented HUE and CHROMA bounds', () => {
+    expect(SHIFT_BOUNDS.HUE).toEqual([-180, 180])
+    expect(SHIFT_BOUNDS.CHROMA).toEqual([0, 200])
+  })
+
+  it('should not throw for every supported color space', () => {
+    const spaces = [
+      'LCH',
+      'OKLCH',
+      'LAB',
+      'OKLAB',
+      'HSL',
+      'HSV',
+      'HSLUV',
+    ] as const
+
+    spaces.forEach((colorSpace) => {
+      expect(() =>
+        sampleShiftGradient(sourceColor, 'HUE', { colorSpace, steps: 4 })
+      ).not.toThrow()
+    })
+  })
+})
+
+describe('blendShiftGradients', () => {
+  const red: Channel = [255, 0, 0]
+  const blue: Channel = [0, 0, 255]
+
+  it('should return an empty array when given no tracks', () => {
+    expect(blendShiftGradients([])).toEqual([])
+  })
+
+  it('should return the single track unchanged when given only one', () => {
+    const track = sampleShiftGradient(red, 'HUE', { steps: 5 })
+
+    expect(blendShiftGradients([track])).toEqual(track)
+  })
+
+  it('should preserve the offsets of the source tracks', () => {
+    const trackA = sampleShiftGradient(red, 'HUE', { steps: 5 })
+    const trackB = sampleShiftGradient(blue, 'HUE', { steps: 5 })
+    const blended = blendShiftGradients([trackA, trackB])
+
+    expect(blended.map((stop) => stop.offset)).toEqual(
+      trackA.map((stop) => stop.offset)
+    )
+  })
+
+  it('should average the color of every contributing track at each offset', () => {
+    const trackA = sampleShiftGradient(red, 'HUE', {
+      steps: 3,
+      algorithmVersion: 'v1',
+    })
+    const trackB = sampleShiftGradient(blue, 'HUE', {
+      steps: 3,
+      algorithmVersion: 'v1',
+    })
+    const blended = blendShiftGradients([trackA, trackB])
+
+    blended.forEach((stop, index) => {
+      const expected = chroma
+        .average([trackA[index].color, trackB[index].color])
+        .hex()
+      expect(stop.color).toBe(expected)
+    })
+  })
+
+  it('should flag a blended stop as out of gamut if any contributor is', () => {
+    const saturated = sampleShiftGradient(red, 'CHROMA', { steps: 4 })
+    const gray = sampleShiftGradient([128, 128, 128], 'CHROMA', { steps: 4 })
+    const blended = blendShiftGradients([saturated, gray])
+
+    expect(
+      blended.some(
+        (stop, index) => stop.outOfGamut && saturated[index].outOfGamut
+      )
+    ).toBe(true)
+  })
+})
+
+describe('sampleLightnessGradient', () => {
+  const sourceColor: Channel = [200, 60, 60]
+  const neutralShift = {
+    hue: makeDefaultShift('HUE'),
+    chroma: makeDefaultShift('CHROMA'),
+  }
+  const range = { min: 10, max: 90 }
+
+  it('should return the requested number of stops, spanning the domain', () => {
+    const stops = sampleLightnessGradient(sourceColor, neutralShift, range, {
+      steps: 8,
+    })
+
+    expect(stops).toHaveLength(8)
+    expect(stops[0].offset).toBe(0)
+    expect(stops[stops.length - 1].offset).toBe(1)
+  })
+
+  it('should get monotonically lighter across the default 0-100 domain, from genuine black', () => {
+    const stops = sampleLightnessGradient(sourceColor, neutralShift, range, {
+      steps: 5,
+    })
+    const luminances = stops.map((stop) => chroma(stop.color).luminance())
+
+    expect(luminances[0]).toBeLessThan(0.01)
+    luminances.forEach((luminance, index) => {
+      if (index > 0) expect(luminance).toBeGreaterThan(luminances[index - 1])
+    })
+  })
+
+  it('should respect a custom domain', () => {
+    const stops = sampleLightnessGradient(sourceColor, neutralShift, range, {
+      steps: 3,
+      domain: { min: 20, max: 80 },
+    })
+
+    expect(chroma(stops[0].color).luminance()).toBeGreaterThan(0.01)
+  })
+
+  it('should apply the configured hue/chroma shift via resolveShift, not hold it neutral', () => {
+    const hueShift: ShiftCurveConfiguration = {
+      min: -60,
+      max: 60,
+      value: 0,
+      curve: 'HYPERBOLA',
+    }
+    const shifted = sampleLightnessGradient(
+      sourceColor,
+      { hue: hueShift, chroma: neutralShift.chroma },
+      range,
+      { steps: 5 }
+    )
+    const neutral = sampleLightnessGradient(sourceColor, neutralShift, range, {
+      steps: 5,
+    })
+
+    expect(shifted[1].color).not.toBe(neutral[1].color)
+  })
+
+  it('should not throw for every supported color space', () => {
+    const spaces = [
+      'LCH',
+      'OKLCH',
+      'LAB',
+      'OKLAB',
+      'HSL',
+      'HSV',
+      'HSLUV',
+    ] as const
+
+    spaces.forEach((colorSpace) => {
+      expect(() =>
+        sampleLightnessGradient(sourceColor, neutralShift, range, {
+          colorSpace,
+          steps: 4,
+        })
+      ).not.toThrow()
+    })
+  })
+
+  it('should flag stops as out of gamut when the shift pushes chroma to extremes', () => {
+    const chromaShift: ShiftCurveConfiguration = {
+      min: 0,
+      max: 200,
+      value: 200,
+      curve: 'LINEAR',
+    }
+    const stops = sampleLightnessGradient(
+      sourceColor,
+      { hue: neutralShift.hue, chroma: chromaShift },
+      range,
+      { steps: 6 }
+    )
+
+    expect(stops.some((stop) => stop.outOfGamut)).toBe(true)
+  })
+})
