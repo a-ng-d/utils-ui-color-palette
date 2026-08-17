@@ -30,6 +30,8 @@ export interface PreviewOptions {
 
 export interface SampleShiftOptions {
   steps?: number
+  otherShift?: ShiftCurveConfiguration
+  lightnessRange?: { min: number; max: number }
 }
 
 export interface SampleLightnessOptions {
@@ -289,15 +291,26 @@ export default class Preview {
     channel: ShiftChannel,
     options: SampleShiftOptions = {}
   ): ShiftGradientStop[] => {
-    const { steps = 12 } = options
+    const { steps = 12, otherShift, lightnessRange } = options
     const [lowerBound, upperBound] = SHIFT_BOUNDS[channel]
+    const otherChannel: ShiftChannel = channel === 'HUE' ? 'CHROMA' : 'HUE'
+
+    const resolvedOtherValue =
+      otherShift !== undefined && lightnessRange !== undefined
+        ? resolveShift(
+            otherShift,
+            chroma(this.sourceColor).lch()[0],
+            lightnessRange,
+            otherChannel
+          )
+        : SHIFT_NEUTRAL[otherChannel]
 
     return Array.from({ length: steps }, (_, i) => {
       const t = steps === 1 ? 0 : i / (steps - 1)
       const shiftValue = lerp(lowerBound, upperBound, t)
-      const hueShifting = channel === 'HUE' ? shiftValue : 0
+      const hueShifting = channel === 'HUE' ? shiftValue : resolvedOtherValue
       const chromaShifting =
-        channel === 'CHROMA' ? shiftValue : SHIFT_NEUTRAL.CHROMA
+        channel === 'CHROMA' ? shiftValue : resolvedOtherValue
 
       const sample = sampleColorAt(
         this.sourceColor,
