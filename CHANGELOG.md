@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.1] - 2026-08-17
+
+### Added
+
+- **`Preview#sampleShift` — `otherShift` / `lightnessRange` options**: when both are provided, the channel not being swept is resolved via `resolveShift` (at the source color's own LCH lightness, used as a representative anchor point) instead of held at its neutral value. Lets a Chroma sweep reflect whatever Hue shift is already configured, and vice versa — the same principle `sampleLightness` already applied to both channels. Omitting them keeps the previous behavior (neutral hue/chroma) unchanged
+
+### Changed
+
+- **`Preview#sampleShift` doc**: clarified that only *its own* curve (`LINEAR`/`HYPERBOLA`/`FREE`) is irrelevant to this sweep — the other channel's curve now matters when `otherShift`/`lightnessRange` are passed
+
 ## [1.12.0] - 2026-08-16
 
 ### Added
