@@ -93,6 +93,58 @@ describe('Preview#sampleShift', () => {
       ).not.toThrow()
     })
   })
+
+  it('should hold the other channel at neutral when otherShift/lightnessRange are not provided', () => {
+    const stops = new Preview({
+      sourceColor,
+      algorithmVersion: 'v1',
+    }).sampleShift('CHROMA', { steps: 3 })
+
+    const distance = chroma.distance(stops[1].color, chroma(sourceColor).hex())
+    expect(distance).toBeLessThan(5)
+  })
+
+  it('should resolve the other channel real shift when otherShift and lightnessRange are provided', () => {
+    const range = { min: 10, max: 90 }
+    const hueShift: ShiftCurveConfiguration = {
+      min: 45,
+      max: 45,
+      value: 45,
+      curve: 'LINEAR',
+    }
+
+    const withHueShift = new Preview({ sourceColor }).sampleShift('CHROMA', {
+      steps: 3,
+      otherShift: hueShift,
+      lightnessRange: range,
+    })
+    const withoutHueShift = new Preview({ sourceColor }).sampleShift('CHROMA', {
+      steps: 3,
+    })
+
+    expect(withHueShift[1].color).not.toBe(withoutHueShift[1].color)
+  })
+
+  it('should resolve the other channel real shift symmetrically for a HUE sweep', () => {
+    const range = { min: 10, max: 90 }
+    const chromaShift: ShiftCurveConfiguration = {
+      min: 150,
+      max: 150,
+      value: 150,
+      curve: 'LINEAR',
+    }
+
+    const withChromaShift = new Preview({ sourceColor }).sampleShift('HUE', {
+      steps: 3,
+      otherShift: chromaShift,
+      lightnessRange: range,
+    })
+    const withoutChromaShift = new Preview({ sourceColor }).sampleShift('HUE', {
+      steps: 3,
+    })
+
+    expect(withChromaShift[1].color).not.toBe(withoutChromaShift[1].color)
+  })
 })
 
 describe('Preview.blend', () => {
